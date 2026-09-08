@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -19,7 +22,6 @@
             background-size: 28px 28px;
         }
 
-        /* Glassmorphism Cards */
         .y2k-card {
             background: rgba(18, 18, 22, 0.75);
             backdrop-filter: blur(12px);
@@ -32,7 +34,6 @@
             box-shadow: 0 12px 30px -5px rgba(168, 85, 247, 0.3);
         }
 
-        /* Glowing Text & Buttons */
         .glow-text {
             text-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
         }
@@ -45,12 +46,9 @@
             filter: brightness(1.15);
         }
 
-        /* Side Nav Drawer Slide Animation */
-        #menu-drawer {
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        #menu-drawer { transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+        #map { height: 180px; border-radius: 0.75rem; }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
@@ -67,7 +65,6 @@
             <span class="hidden md:inline-block text-xs bg-purple-950/80 text-purple-300 border border-purple-800/50 px-3 py-1 rounded-full font-bold">
                 🚚 Delivery 58 Wilayas
             </span>
-            <!-- 3 Stripes Hamburger Menu Button -->
             <button onclick="toggleMenu()" class="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 text-white hover:border-purple-500 transition focus:outline-none">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -76,7 +73,7 @@
         </div>
     </header>
 
-    <!-- Slide-out Navigation Drawer -->
+    <!-- Side Navigation Drawer -->
     <div id="menu-overlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
     <aside id="menu-drawer" class="fixed top-0 right-0 h-full w-80 bg-zinc-950 border-l border-zinc-800 z-50 p-6 flex flex-col justify-between translate-x-full">
         <div>
@@ -98,14 +95,13 @@
         </div>
     </aside>
 
-    <!-- Main Container -->
+    <!-- Main Storefront Catalog -->
     <main class="max-w-7xl mx-auto px-6 py-12 flex-grow w-full">
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tight mb-3">Y2K & Alternative Archive</h1>
-            <p class="text-zinc-400 text-sm md:text-base max-w-xl mx-auto">Curated street clothing drops. Cash on delivery available across all 58 Algerian Wilayas.</p>
+            <p class="text-zinc-400 text-sm md:text-base max-w-xl mx-auto">Curated street clothing drops. Fast Cash-On-Delivery across Algeria.</p>
         </div>
 
-        <!-- Product Grid -->
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <div class="col-span-full text-center py-16 text-zinc-500 animate-pulse">Loading archive catalog...</div>
         </div>
@@ -113,29 +109,50 @@
 
     <!-- Checkout Modal -->
     <div id="checkout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 relative">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeCheckout()" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-xl font-bold">&times;</button>
             <h3 class="text-xl font-black text-white mb-1">Confirm Your Order</h3>
-            <p id="modal-product-title" class="text-purple-400 text-sm font-semibold mb-6"></p>
+            <p id="modal-product-title" class="text-purple-400 text-sm font-semibold mb-4"></p>
 
             <form id="order-form" onsubmit="handleOrderSubmit(event)" class="space-y-4">
                 <input type="hidden" id="selected-product-id">
+                <input type="hidden" id="cust-coords">
+
                 <div>
                     <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Full Name</label>
-                    <input type="text" id="cust-name" required placeholder="e.g. Amine Belkacem" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    <input type="text" id="cust-name" required placeholder="e.g. Karim Belkacem" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Phone Number</label>
-                    <input type="tel" id="cust-phone" required placeholder="e.g. 0552168164" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    <input type="tel" id="cust-phone" required placeholder="e.g. 0550123456" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                 </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Wilaya / State</label>
+                        <select id="cust-wilaya" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Commune / District</label>
+                        <input type="text" id="cust-commune" required placeholder="e.g. Bab Ezzouar" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Wilaya</label>
-                    <select id="cust-wilaya" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"></select>
+                    <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Street Address</label>
+                    <textarea id="cust-address" required placeholder="e.g. Cité 1000 Logements, Bâtiment B, N° 12" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"></textarea>
                 </div>
+
+                <!-- Pin Location on Map -->
                 <div>
-                    <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Shipping Address</label>
-                    <textarea id="cust-address" required placeholder="Street address, city details..." rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"></textarea>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-zinc-400 uppercase">Pin Exact Delivery Spot</label>
+                        <button type="button" onclick="locateUser()" class="text-xs text-purple-400 hover:underline">📍 Use My GPS</button>
+                    </div>
+                    <div id="map" class="border border-zinc-800"></div>
+                    <p id="location-status" class="text-[11px] text-zinc-500 mt-1">Tap/click the map or drag marker to set precise drop point.</p>
                 </div>
+
                 <button type="submit" id="submit-btn" class="w-full y2k-btn py-3 text-white font-black rounded-lg uppercase tracking-wider text-sm mt-2">
                     Confirm Cash On Delivery Order
                 </button>
@@ -146,7 +163,6 @@
     <!-- About Us & Contact Footer -->
     <footer class="bg-zinc-950 border-t border-zinc-800/80 mt-20 pt-16 pb-12 px-6">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
-            <!-- About Us Section -->
             <div id="about-us">
                 <h3 class="text-2xl font-black text-white uppercase tracking-wider mb-4">About XENNNSTOREE</h3>
                 <p class="text-zinc-400 text-sm leading-relaxed mb-4">
@@ -157,7 +173,6 @@
                 </p>
             </div>
 
-            <!-- Contact Information Section -->
             <div id="contact">
                 <h3 class="text-2xl font-black text-white uppercase tracking-wider mb-4">Contact Information</h3>
                 <div class="space-y-4 text-sm text-zinc-300">
@@ -183,7 +198,7 @@
         </div>
     </footer>
 
-    <!-- JavaScript Logic -->
+    <!-- JavaScript Engine -->
     <script>
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
@@ -191,8 +206,8 @@
 
         let allProducts = [];
         let activeCategory = 'all';
+        let map, marker;
 
-        // 58 Algerian Wilayas
         const wilayas = [
             "1 - Adrar", "2 - Chlef", "3 - Laghouat", "4 - Oum El Bouaghi", "5 - Batna", "6 - Béjaïa", "7 - Biskra",
             "8 - Béchar", "9 - Blida", "10 - Bouira", "11 - Tamanrasset", "12 - Tébessa", "13 - Tlemcen", "14 - Tiaret",
@@ -205,7 +220,6 @@
             "53 - Béni Abbès", "54 - Timimoun", "55 - Touggourt", "56 - Djanet", "57 - In Salah", "58 - In Guezzam"
         ];
 
-        // Populate Wilayas Dropdown
         const wilayaSelect = document.getElementById('cust-wilaya');
         wilayas.forEach(w => {
             const opt = document.createElement('option');
@@ -214,12 +228,10 @@
             wilayaSelect.appendChild(opt);
         });
 
-        // Toggle Drawer Navigation
         function toggleMenu() {
             const drawer = document.getElementById('menu-drawer');
             const overlay = document.getElementById('menu-overlay');
             const isOpen = !drawer.classList.contains('translate-x-full');
-
             if (isOpen) {
                 drawer.classList.add('translate-x-full');
                 overlay.classList.add('opacity-0', 'pointer-events-none');
@@ -229,7 +241,6 @@
             }
         }
 
-        // Fetch Products
         async function fetchProducts() {
             const grid = document.getElementById('product-grid');
             const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: false });
@@ -243,19 +254,15 @@
             renderProducts();
         }
 
-        // Filter Category
         function filterCategory(cat) {
             activeCategory = cat;
             toggleMenu();
             renderProducts();
         }
 
-        // Render Cards with Category Filter
         function renderProducts() {
             const grid = document.getElementById('product-grid');
-            const filtered = activeCategory === 'all' 
-                ? allProducts 
-                : allProducts.filter(p => p.category === activeCategory);
+            const filtered = activeCategory === 'all' ? allProducts : allProducts.filter(p => p.category === activeCategory);
 
             if (filtered.length === 0) {
                 grid.innerHTML = `<p class="text-zinc-500 col-span-full text-center py-12 font-semibold">No items available in this category right now.</p>`;
@@ -292,11 +299,57 @@
             `).join('');
         }
 
-        // Modal Controls
+        // Initialize Map in Checkout Modal
+        function initMap() {
+            if (map) return;
+            const defaultLat = 36.7538; // Algiers central coordinates
+            const defaultLng = 3.0588;
+
+            map = L.map('map').setView([defaultLat, defaultLng], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+            updateCoords(defaultLat, defaultLng);
+
+            marker.on('dragend', function (e) {
+                const latlng = marker.getLatLng();
+                updateCoords(latlng.lat, latlng.lng);
+            });
+
+            map.on('click', function (e) {
+                marker.setLatLng(e.latlng);
+                updateCoords(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        function updateCoords(lat, lng) {
+            document.getElementById('cust-coords').value = `${lat.toFixed(5)},${lng.toFixed(5)}`;
+            document.getElementById('location-status').textContent = `Pinned Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        }
+
+        function locateUser() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    map.setView([lat, lng], 15);
+                    marker.setLatLng([lat, lng]);
+                    updateCoords(lat, lng);
+                }, () => alert("Could not access GPS. Please tap your location manually on the map."));
+            }
+        }
+
         function openCheckout(id, title) {
             document.getElementById('selected-product-id').value = id;
             document.getElementById('modal-product-title').textContent = title;
             document.getElementById('checkout-modal').classList.remove('hidden');
+            setTimeout(() => {
+                initMap();
+                map.invalidateSize();
+            }, 200);
         }
 
         function closeCheckout() {
@@ -304,7 +357,6 @@
             document.getElementById('order-form').reset();
         }
 
-        // Submit Order
         async function handleOrderSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
@@ -316,6 +368,8 @@
                 customer_name: document.getElementById('cust-name').value,
                 phone_number: document.getElementById('cust-phone').value,
                 wilaya: document.getElementById('cust-wilaya').value,
+                commune: document.getElementById('cust-commune').value,
+                coordinates: document.getElementById('cust-coords').value,
                 address: document.getElementById('cust-address').value
             };
 
