@@ -57,8 +57,8 @@
                 🛒 (<span id="cart-count">0</span>)
             </a>
 
-            <!-- Hamburger Three Stripes Button -->
-            <button onclick="toggleMenu()" class="p-2 text-zinc-950 hover:text-red-600 focus:outline-none rounded-lg border border-red-200 bg-white">
+            <!-- Three Stripes Menu Button -->
+            <button onclick="toggleMenu()" class="p-2.5 text-zinc-950 hover:text-red-600 focus:outline-none rounded-xl border border-red-200 bg-white shadow-sm transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
@@ -66,30 +66,61 @@
         </div>
     </header>
 
-    <!-- Slide-Out Navigation Menu -->
+    <!-- Slide-Out Drawer Navigation Menu -->
     <div id="nav-drawer" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity" onclick="toggleMenu()">
-        <div class="fixed top-0 right-0 w-80 h-full bg-white p-6 shadow-2xl space-y-6 border-l border-red-200" onclick="event.stopPropagation()">
+        <div class="fixed top-0 right-0 w-80 h-full bg-white p-6 shadow-2xl space-y-6 border-l border-red-200 overflow-y-auto" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-red-100 pb-4">
-                <span class="font-black text-lg uppercase text-zinc-950">Navigation</span>
-                <button onclick="toggleMenu()" class="text-zinc-500 font-black text-xl hover:text-red-600">&times;</button>
+                <span class="font-black text-lg uppercase text-zinc-950">Menu Navigation</span>
+                <button onclick="toggleMenu()" class="text-zinc-500 font-black text-2xl hover:text-red-600">&times;</button>
             </div>
 
-            <nav class="space-y-4">
-                <a href="#catalog-section" onclick="toggleMenu()" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2">
-                    🛍️ In-Stock Catalog
-                </a>
-                <button onclick="toggleMenu(); openImportModal();" class="w-full text-left font-bold text-red-600 hover:text-red-700 uppercase text-sm py-2 flex items-center justify-between">
-                    <span>📦 AliExpress / Shein / Temu Import</span>
-                    <span class="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded font-black">Agent</span>
-                </button>
-                <a href="cart.html" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2">
-                    🛒 My Basket (<span class="menu-cart-count">0</span>)
-                </a>
+            <nav class="space-y-6">
+                <!-- Category Section -->
+                <div>
+                    <span class="text-[10px] font-black tracking-widest text-zinc-400 uppercase block mb-2">Browse Clothing Types</span>
+                    <div class="space-y-1">
+                        <button onclick="filterCategory('all'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
+                            <span>🔥 All Drops</span>
+                            <span class="text-xs text-zinc-400 font-normal">View All</span>
+                        </button>
+                        <button onclick="filterCategory('Hoodies'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
+                            <span>🧥 Hoodies & Zip-ups</span>
+                        </button>
+                        <button onclick="filterCategory('T-Shirts'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
+                            <span>👕 T-Shirts & Tops</span>
+                        </button>
+                        <button onclick="filterCategory('Pants'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
+                            <span>👖 Pants & Sweatpants</span>
+                        </button>
+                        <button onclick="filterCategory('Outerwear'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
+                            <span>🧥 Jackets & Outerwear</span>
+                        </button>
+                        <button onclick="filterCategory('Accessories'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
+                            <span>🧢 Accessories & Caps</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Import Section -->
+                <div class="border-t border-red-100 pt-4">
+                    <span class="text-[10px] font-black tracking-widest text-zinc-400 uppercase block mb-2">Global Import Service</span>
+                    <button onclick="toggleMenu(); openImportModal();" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3 px-4 rounded-xl shadow-md transition flex items-center justify-between">
+                        <span>📦 Order Shein / AliExpress / Temu</span>
+                        <span class="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded">Agent</span>
+                    </button>
+                </div>
+
+                <!-- Cart Link -->
+                <div class="border-t border-red-100 pt-4">
+                    <a href="cart.html" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition">
+                        🛒 View Shopping Basket (<span class="menu-cart-count">0</span>)
+                    </a>
+                </div>
             </nav>
         </div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
 
         <!-- Hero Section -->
@@ -98,23 +129,27 @@
                 Exclusive Streetwear <span class="text-red-600">& Local Drops</span>
             </h1>
             <p class="text-zinc-600 text-sm md:text-base max-w-2xl mx-auto">
-                Explore in-stock localized drops or tap the menu (☰) to order directly from AliExpress, Shein, and Temu with 58 Wilaya delivery.
+                Explore in-stock localized drops or tap the top-right menu (☰) to order directly from AliExpress, Shein, and Temu with 58 Wilaya delivery.
             </p>
         </section>
 
-        <!-- Product Catalog Drop Section -->
+        <!-- Product Catalog Section -->
         <section id="catalog-section">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black uppercase text-zinc-950">In-Stock Catalog</h2>
-                <span class="text-xs font-bold text-red-600">Tap product for details</span>
+                <div>
+                    <h2 class="text-2xl font-black uppercase text-zinc-950" id="catalog-title">In-Stock Catalog</h2>
+                    <p class="text-xs text-zinc-500 hidden" id="filter-active-indicator">Showing filtered items</p>
+                </div>
+                <button onclick="filterCategory('all')" id="reset-filter-btn" class="hidden text-xs font-bold text-red-600 underline">Show All</button>
             </div>
+            
             <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div class="col-span-full text-center py-12 text-zinc-400">Loading catalog...</div>
             </div>
         </section>
     </main>
 
-    <!-- Modal Popup Window: AliExpress / Shein / Temu Ordering -->
+    <!-- Modal Popup Window: Shein / AliExpress / Temu Agent Ordering -->
     <div id="import-modal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImportModal()">
         <div class="y2k-card w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 space-y-6 overflow-y-auto max-h-[90vh] border-2 border-red-300" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-red-100 pb-3">
@@ -125,12 +160,12 @@
                 <button onclick="closeImportModal()" class="text-zinc-400 font-black text-2xl hover:text-red-600">&times;</button>
             </div>
 
-            <p class="text-xs text-zinc-600">Paste your product URL from AliExpress, Shein, or Temu and we will manage the currency payment and door-to-door delivery in Algeria.</p>
+            <p class="text-xs text-zinc-600">Paste your product URL from Shein, AliExpress, or Temu. We handle international payment and local delivery to all 58 Wilayas.</p>
 
             <form id="import-order-form" onsubmit="handleImportOrder(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Product Link (URL) *</label>
-                    <input type="url" id="import-url" required placeholder="https://www.aliexpress.com/item/... or Shein/Temu link" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <input type="url" id="import-url" required placeholder="https://www.shein.com/item... or AliExpress/Temu link" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Full Name *</label>
@@ -173,6 +208,8 @@
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allProducts = [];
 
         function toggleMenu() {
             const drawer = document.getElementById('nav-drawer');
@@ -222,7 +259,18 @@
                 return;
             }
 
-            grid.innerHTML = data.map(p => `
+            allProducts = data;
+            renderProducts(allProducts);
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('product-grid');
+            if (products.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-500 font-bold">No items found in this category.</div>`;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
                 <div class="y2k-card rounded-2xl overflow-hidden hover:shadow-xl transition flex flex-col justify-between">
                     <a href="product.html?id=${p.id}">
                         <div class="h-64 bg-zinc-100 overflow-hidden relative">
@@ -241,6 +289,30 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        function filterCategory(category) {
+            const titleEl = document.getElementById('catalog-title');
+            const indicatorEl = document.getElementById('filter-active-indicator');
+            const resetBtn = document.getElementById('reset-filter-btn');
+
+            if (category === 'all') {
+                renderProducts(allProducts);
+                titleEl.textContent = 'In-Stock Catalog';
+                indicatorEl.classList.add('hidden');
+                resetBtn.classList.add('hidden');
+            } else {
+                const filtered = allProducts.filter(p => {
+                    const text = (p.title + ' ' + (p.description || '')).toLowerCase();
+                    return text.includes(category.toLowerCase());
+                });
+                renderProducts(filtered);
+                titleEl.textContent = `${category} Catalog`;
+                indicatorEl.classList.remove('hidden');
+                resetBtn.classList.remove('hidden');
+            }
+
+            document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         async function handleImportOrder(e) {
