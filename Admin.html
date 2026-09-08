@@ -18,20 +18,20 @@
     <!-- Auth / Login Modal Screen -->
     <div id="auth-screen" class="fixed inset-0 bg-zinc-950 z-50 flex items-center justify-center p-4">
         <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl max-w-md w-full">
-            <h2 class="text-2xl font-black text-white mb-2">Admin Authentication</h2>
+            <h2 class="text-2xl font-black text-white mb-2">Admin Login</h2>
             <p class="text-zinc-400 text-sm mb-6">Enter your credentials to manage inventory and orders.</p>
             
             <form onsubmit="handleAuth(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Name</label>
-                    <input type="text" id="auth-name" required placeholder="Admin Name" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    <input type="text" id="auth-name" required placeholder="amine" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Email Address</label>
                     <input type="email" id="auth-email" required placeholder="aminegambull@gmail.com" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Session Password</label>
+                    <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Password</label>
                     <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                 </div>
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg text-sm transition">
@@ -54,41 +54,71 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Add Item Form -->
-            <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl h-fit">
-                <h2 class="text-xl font-bold text-white mb-4">Add Archive Item</h2>
-                <form onsubmit="addProduct(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 mb-1">Item Title</label>
-                        <input type="text" id="p-title" required placeholder="e.g. Vintage Cyber Tee" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 mb-1">Category</label>
-                        <select id="p-category" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
-                            <option value="tshirts">👕 T-Shirts & Tops</option>
-                            <option value="jackets">🧥 Jackets & Hoodies</option>
-                            <option value="pants">👖 Pants & Bottoms</option>
-                            <option value="accessories">🧢 Accessories</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
+            
+            <!-- Left Side Controls -->
+            <div class="space-y-6">
+                <!-- Add Item Form -->
+                <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
+                    <h2 class="text-xl font-bold text-white mb-4">Add Archive Item</h2>
+                    <form onsubmit="addProduct(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold text-zinc-400 mb-1">Price (DZD)</label>
-                            <input type="number" id="p-price" required placeholder="3500" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
+                            <label class="block text-xs font-bold text-zinc-400 mb-1">Item Title</label>
+                            <input type="text" id="p-title" required placeholder="e.g. Y2K Graphic Tee" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-zinc-400 mb-1">Size</label>
-                            <input type="text" id="p-size" required placeholder="M / Oversized" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
+                            <label class="block text-xs font-bold text-zinc-400 mb-1">Category</label>
+                            <select id="p-category" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
+                                <option value="tshirts">👕 T-Shirts & Tops</option>
+                                <option value="jackets">🧥 Jackets & Hoodies</option>
+                                <option value="pants">👖 Pants & Bottoms</option>
+                                <option value="accessories">🧢 Accessories</option>
+                            </select>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 mb-1">Image Link (URL)</label>
-                        <input type="url" id="p-image" required placeholder="https://..." class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
-                    </div>
-                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-lg text-sm text-white transition">
-                        Publish Item
-                    </button>
-                </form>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-zinc-400 mb-1">Price (DZD)</label>
+                                <input type="number" id="p-price" required placeholder="3500" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-zinc-400 mb-1">Size</label>
+                                <input type="text" id="p-size" required placeholder="M / Oversized" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
+                            </div>
+                        </div>
+
+                        <!-- Upload Photo Directly OR Use URL -->
+                        <div class="space-y-2 border-t border-zinc-800 pt-3">
+                            <label class="block text-xs font-bold text-purple-400 uppercase">Product Image</label>
+                            <div>
+                                <label class="block text-[11px] text-zinc-400 mb-1">Option 1: Upload Image File</label>
+                                <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-zinc-400 bg-zinc-950 p-2 rounded-lg border border-zinc-800 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-purple-950 file:text-purple-300">
+                            </div>
+                            <div class="text-center text-xs text-zinc-600 font-bold">OR</div>
+                            <div>
+                                <label class="block text-[11px] text-zinc-400 mb-1">Option 2: Paste Image URL Link</label>
+                                <input type="url" id="p-image-url" placeholder="https://..." class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="add-btn" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-lg text-sm text-white transition mt-2">
+                            Publish Item
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Admin Credentials Manager -->
+                <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
+                    <h2 class="text-xl font-bold text-white mb-2">User & Session Access</h2>
+                    <p class="text-xs text-zinc-400 mb-4">Manage admin accounts and set custom passwords.</p>
+                    <form onsubmit="addUserCredential(event)" class="space-y-3">
+                        <input type="text" id="new-user-name" required placeholder="User Name" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white">
+                        <input type="email" id="new-user-email" required placeholder="user@email.com" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white">
+                        <input type="text" id="new-user-pass" required placeholder="Set Password" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white">
+                        <button type="submit" class="w-full bg-zinc-800 hover:bg-zinc-700 text-purple-300 font-bold py-2 rounded-lg text-xs transition border border-purple-800/40">
+                            + Add Authorized Admin
+                        </button>
+                    </form>
+                    <div id="users-list" class="mt-4 space-y-2 pt-3 border-t border-zinc-800"></div>
+                </div>
             </div>
 
             <!-- Active Orders & Items -->
@@ -108,40 +138,93 @@
         </div>
     </div>
 
-    <!-- Script Logic -->
+    <!-- Script Engine -->
     <script>
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Session Authentication Logic
+        // Owner Default Credentials
+        const defaultOwner = {
+            name: "amine",
+            email: "aminegambull@gmail.com",
+            pass: "Mimimimoo7"
+        };
+
+        function getStoredUsers() {
+            const stored = localStorage.getItem('xennn_admin_users');
+            if (!stored) {
+                const initialList = [defaultOwner];
+                localStorage.setItem('xennn_admin_users', JSON.stringify(initialList));
+                return initialList;
+            }
+            return JSON.parse(stored);
+        }
+
         function checkSession() {
-            const user = JSON.parse(sessionStorage.getItem('xennn_admin_user'));
+            const user = JSON.parse(sessionStorage.getItem('xennn_admin_session'));
             if (user) {
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('admin-content').classList.remove('hidden');
                 document.getElementById('user-greeting').textContent = `Logged in as: ${user.name} (${user.email})`;
                 loadData();
+                renderUsersList();
             }
         }
 
         function handleAuth(e) {
             e.preventDefault();
-            const user = {
-                name: document.getElementById('auth-name').value,
-                email: document.getElementById('auth-email').value,
-                pass: document.getElementById('auth-password').value
-            };
-            sessionStorage.setItem('xennn_admin_user', JSON.stringify(user));
-            checkSession();
+            const inputName = document.getElementById('auth-name').value.trim();
+            const inputEmail = document.getElementById('auth-email').value.trim().toLowerCase();
+            const inputPass = document.getElementById('auth-password').value.trim();
+
+            const validUsers = getStoredUsers();
+            const matched = validUsers.find(u => 
+                u.name.toLowerCase() === inputName.toLowerCase() && 
+                u.email.toLowerCase() === inputEmail && 
+                u.pass === inputPass
+            );
+
+            if (matched) {
+                sessionStorage.setItem('xennn_admin_session', JSON.stringify(matched));
+                checkSession();
+            } else {
+                alert("Invalid Credentials! Check your name, email, and password.");
+            }
         }
 
         function logout() {
-            sessionStorage.removeItem('xennn_admin_user');
+            sessionStorage.removeItem('xennn_admin_session');
             location.reload();
         }
 
-        // Fetch Orders & Inventory
+        function addUserCredential(e) {
+            e.preventDefault();
+            const users = getStoredUsers();
+            const newUser = {
+                name: document.getElementById('new-user-name').value.trim(),
+                email: document.getElementById('new-user-email').value.trim().toLowerCase(),
+                pass: document.getElementById('new-user-pass').value.trim()
+            };
+            users.push(newUser);
+            localStorage.setItem('xennn_admin_users', JSON.stringify(users));
+            alert(`Added admin: ${newUser.name}`);
+            e.target.reset();
+            renderUsersList();
+        }
+
+        function renderUsersList() {
+            const users = getStoredUsers();
+            const div = document.getElementById('users-list');
+            div.innerHTML = `<p class="text-[11px] font-bold text-zinc-500 uppercase">Authorized Admins:</p>` + 
+                users.map(u => `
+                    <div class="flex justify-between items-center text-xs bg-zinc-950 p-2 rounded border border-zinc-800">
+                        <span class="text-white font-semibold">${u.name} (${u.email})</span>
+                        <span class="text-purple-400 font-mono">Pass: ${u.pass}</span>
+                    </div>
+                `).join('');
+        }
+
         async function loadData() {
             // Load Orders
             const { data: orders } = await _supabase.from('orders').select('*, products(title, price)').order('id', { ascending: false });
@@ -150,16 +233,21 @@
             if (!orders || orders.length === 0) {
                 ordersDiv.innerHTML = `<p class="text-zinc-500 text-sm">No incoming orders yet.</p>`;
             } else {
-                ordersDiv.innerHTML = orders.map(o => `
-                    <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-xl text-sm flex justify-between items-start">
-                        <div>
-                            <span class="text-purple-400 font-bold">${o.products?.title || 'Item'}</span>
-                            <p class="text-white font-semibold">${o.customer_name} (${o.phone_number})</p>
-                            <p class="text-zinc-400 text-xs">${o.wilaya} - ${o.address}</p>
+                ordersDiv.innerHTML = orders.map(o => {
+                    const mapLink = o.coordinates ? `https://www.google.com/maps?q=${o.coordinates}` : null;
+                    return `
+                        <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-xl text-sm flex justify-between items-start">
+                            <div>
+                                <span class="text-purple-400 font-bold">${o.products?.title || 'Item'}</span>
+                                <p class="text-white font-semibold">${o.customer_name} (${o.phone_number})</p>
+                                <p class="text-zinc-400 text-xs">${o.wilaya} ${o.commune ? '• ' + o.commune : ''}</p>
+                                <p class="text-zinc-400 text-xs">${o.address}</p>
+                                ${mapLink ? `<a href="${mapLink}" target="_blank" class="inline-block mt-2 text-xs text-purple-400 hover:underline">📍 View Pinned Spot on Google Maps</a>` : ''}
+                            </div>
+                            <span class="text-xs bg-purple-950 text-purple-300 border border-purple-800 px-2 py-1 rounded font-bold">${o.products?.price || 0} DZD</span>
                         </div>
-                        <span class="text-xs bg-purple-950 text-purple-300 border border-purple-800 px-2 py-1 rounded font-bold">${o.products?.price || 0} DZD</span>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             // Load Inventory
@@ -184,29 +272,70 @@
             }
         }
 
-        // Add Product Function
         async function addProduct(e) {
             e.preventDefault();
+            const btn = document.getElementById('add-btn');
+            btn.disabled = true;
+            btn.textContent = "Publishing...";
+
+            let finalImageUrl = document.getElementById('p-image-url').value.trim();
+            const fileInput = document.getElementById('p-file');
+
+            // Handle Direct Image File Upload if Selected
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+
+                const { data: uploadData, error: uploadError } = await _supabase
+                    .storage
+                    .from('product-images')
+                    .upload(fileName, file);
+
+                if (uploadError) {
+                    alert("Image upload failed! Ensure the 'product-images' bucket is created and set to Public in Supabase.");
+                    btn.disabled = false;
+                    btn.textContent = "Publish Item";
+                    return;
+                }
+
+                const { data: publicUrlData } = _supabase
+                    .storage
+                    .from('product-images')
+                    .getPublicUrl(fileName);
+
+                finalImageUrl = publicUrlData.publicUrl;
+            }
+
+            if (!finalImageUrl) {
+                alert("Please upload an image file OR enter an image URL.");
+                btn.disabled = false;
+                btn.textContent = "Publish Item";
+                return;
+            }
+
             const newItem = {
                 title: document.getElementById('p-title').value,
                 category: document.getElementById('p-category').value,
                 price: parseFloat(document.getElementById('p-price').value),
                 size: document.getElementById('p-size').value,
-                image_url: document.getElementById('p-image').value,
+                image_url: finalImageUrl,
                 is_available: true
             };
 
             const { error } = await _supabase.from('products').insert([newItem]);
             if (!error) {
-                alert("Product published!");
+                alert("Product published successfully!");
                 e.target.reset();
                 loadData();
             } else {
-                alert("Error adding item.");
+                alert("Error adding item to database.");
             }
+
+            btn.disabled = false;
+            btn.textContent = "Publish Item";
         }
 
-        // Toggle Stock Availability
         async function toggleStock(id, currentStatus) {
             await _supabase.from('products').update({ is_available: !currentStatus }).eq('id', id);
             loadData();
