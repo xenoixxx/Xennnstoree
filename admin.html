@@ -1,594 +1,370 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XENNNSTOREE | Admin Dashboard</title>
-    <!-- Tailwind CSS -->
+    <title>XENNNSTOREE | Admin Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Chart.js for Analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #09090b;
-            color: #f4f4f5;
-            font-family: 'Space Grotesk', sans-serif;
-            background-image: radial-gradient(rgba(168, 85, 247, 0.12) 1px, transparent 0);
-            background-size: 28px 28px;
-        }
-
-        .y2k-card {
-            background: rgba(18, 18, 22, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .tab-btn.active {
-            background-color: #a855f7;
-            color: #ffffff;
-            border-color: #c084fc;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
-        }
-
-        .y2k-btn {
-            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
-            transition: all 0.25s ease;
-        }
-        .y2k-btn:hover {
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
-            filter: brightness(1.15);
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #09090b; }
-        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
+        body { font-family: 'Space Grotesk', sans-serif; background: #09090b; color: #f4f4f5; }
+        .admin-card { background: #18181b; border: 1px solid #27272a; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body class="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
 
-    <!-- Header -->
-    <header class="bg-zinc-950 border-b border-zinc-800 px-6 py-4 flex justify-between items-center sticky top-0 z-40">
-        <div class="flex items-center gap-3">
-            <span class="text-2xl font-black text-white">XENNNSTOREE</span>
-            <span class="bg-purple-950 text-purple-300 border border-purple-800 text-xs px-2.5 py-1 rounded-md font-bold uppercase">Admin Console</span>
+    <!-- Admin Header -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-4 gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-red-500 uppercase tracking-tight">XENNNSTOREE <span class="text-white">ADMIN</span></h1>
+            <p class="text-xs text-zinc-400">Manage Drops, Catalog, Local Orders & Custom Imports</p>
         </div>
-        <a href="index.html" class="text-xs text-zinc-400 hover:text-white transition">View Live Storefront &rarr;</a>
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
+                🌐 View Storefront
+            </a>
+            <button onclick="fetchAdminData()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
+                🔄 Refresh Data
+            </button>
+        </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-8 w-full flex-grow">
-
-        <!-- Navigation Tabs -->
-        <div class="flex flex-wrap gap-3 mb-8 border-b border-zinc-800 pb-4">
-            <button onclick="switchTab('tab-orders')" id="btn-tab-orders" class="tab-btn active px-5 py-2.5 rounded-xl text-sm font-black uppercase border border-zinc-800 bg-zinc-900 text-zinc-400 transition">
-                📦 Customer Orders (<span id="orders-count">0</span>)
-            </button>
-            <button onclick="switchTab('tab-products')" id="btn-tab-products" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-black uppercase border border-zinc-800 bg-zinc-900 text-zinc-400 transition">
-                👕 Manage Products
-            </button>
-            <button onclick="switchTab('tab-analytics')" id="btn-tab-analytics" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-black uppercase border border-zinc-800 bg-zinc-900 text-zinc-400 transition">
-                📊 Sales Analytics
-            </button>
+    <!-- Overview Statistics -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="admin-card p-5 rounded-2xl">
+            <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Products</span>
+            <span class="text-3xl font-black text-white" id="stat-products">0</span>
         </div>
+        <div class="admin-card p-5 rounded-2xl">
+            <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">In-Stock Orders</span>
+            <span class="text-3xl font-black text-emerald-400" id="stat-local-orders">0</span>
+        </div>
+        <div class="admin-card p-5 rounded-2xl">
+            <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Import Requests</span>
+            <span class="text-3xl font-black text-amber-400" id="stat-import-orders">0</span>
+        </div>
+        <div class="admin-card p-5 rounded-2xl">
+            <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Orders</span>
+            <span class="text-3xl font-black text-red-500" id="stat-total-orders">0</span>
+        </div>
+    </section>
 
-        <!-- TAB 1: CUSTOMER ORDERS -->
-        <section id="tab-orders" class="space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-black uppercase text-white">Customer Orders</h2>
-                <button onclick="loadOrders()" class="text-xs text-purple-400 hover:underline">🔄 Refresh Orders List</button>
+    <!-- Add New Product Form Section -->
+    <section class="admin-card p-6 rounded-3xl space-y-4">
+        <h2 class="text-xl font-black uppercase text-white flex items-center gap-2">
+            <span>➕</span> Add New Local Drop
+        </h2>
+        <form id="add-product-form" onsubmit="handleAddProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Title / Name *</label>
+                <input type="text" id="p-title" required placeholder="e.g. Y2K Oversized Graphic Hoodie" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
             </div>
-
-            <div id="orders-container" class="space-y-4">
-                <div class="text-center py-12 text-zinc-500">Loading incoming orders...</div>
-            </div>
-        </section>
-
-        <!-- TAB 2: MANAGE PRODUCTS (PUBLISH, EDIT, DELETE) -->
-        <section id="tab-products" class="hidden space-y-8">
-            
-            <!-- Add New Product Form -->
-            <div class="y2k-card p-6 rounded-2xl">
-                <h2 class="text-xl font-black uppercase text-white mb-4">Add New Product Drop</h2>
-                <form id="add-product-form" onsubmit="handleCreateProduct(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Product Title</label>
-                        <input type="text" id="prod-title" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Price (DZD)</label>
-                        <input type="number" id="prod-price" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Size</label>
-                        <select id="prod-size" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                            <option value="XXL">XXL</option>
-                            <option value="Oversized / Free Size">Oversized / Free Size</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Category</label>
-                        <select id="prod-category" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
-                            <option value="tshirts">T-Shirts & Tops</option>
-                            <option value="jackets">Jackets & Hoodies</option>
-                            <option value="pants">Pants & Bottoms</option>
-                            <option value="accessories">Accessories</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Product Image File</label>
-                        <input type="file" id="prod-file" accept="image/*" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-zinc-300">
-                    </div>
-                    <div class="md:col-span-2">
-                        <button type="submit" id="prod-submit-btn" class="w-full y2k-btn py-3 rounded-lg text-white font-black uppercase text-sm tracking-wider">
-                            Publish Product
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Existing Products Catalog -->
             <div>
-                <h2 class="text-xl font-black uppercase text-white mb-4">Catalog Inventory (<span id="products-count">0</span>)</h2>
-                <div id="products-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="text-zinc-500 text-center col-span-full py-8">Loading inventory...</div>
-                </div>
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Price (DZD) *</label>
+                <input type="number" id="p-price" required placeholder="4500" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
             </div>
-        </section>
-
-        <!-- TAB 3: SALES ANALYTICS -->
-        <section id="tab-analytics" class="hidden space-y-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h2 class="text-2xl font-black uppercase text-white">Sales & Revenue Analytics</h2>
-                    <p class="text-xs text-zinc-400">Track earnings, item counts, and historical revenue performance.</p>
-                </div>
-
-                <!-- Controls for Chart View -->
-                <div class="flex flex-wrap items-center gap-3">
-                    <select id="chart-timeframe" onchange="updateAnalytics()" class="bg-zinc-900 border border-zinc-800 text-xs text-white rounded-lg px-3 py-2">
-                        <option value="today">Sold Today</option>
-                        <option value="month" selected>Sold This Month</option>
-                        <option value="year">Sold This Year</option>
-                    </select>
-
-                    <select id="filter-month" onchange="updateAnalytics()" class="bg-zinc-900 border border-zinc-800 text-xs text-white rounded-lg px-3 py-2">
-                        <option value="0">January</option><option value="1">February</option><option value="2">March</option>
-                        <option value="3">April</option><option value="4">May</option><option value="5">June</option>
-                        <option value="6">July</option><option value="7">August</option><option value="8">September</option>
-                        <option value="9">October</option><option value="10">November</option><option value="11">December</option>
-                    </select>
-
-                    <select id="filter-year" onchange="updateAnalytics()" class="bg-zinc-900 border border-zinc-800 text-xs text-white rounded-lg px-3 py-2">
-                        <option value="2026" selected>2026</option>
-                        <option value="2025">2025</option>
-                    </select>
-                </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Size *</label>
+                <select id="p-size" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL" selected>XL</option>
+                    <option value="XXL">XXL</option>
+                    <option value="Oversized Fit">Oversized Fit</option>
+                </select>
             </div>
-
-            <!-- Summary KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="y2k-card p-5 rounded-2xl">
-                    <span class="block text-xs text-zinc-400 uppercase font-bold mb-1">Total Revenue</span>
-                    <p id="kpi-revenue" class="text-2xl font-black text-purple-400">0 DZD</p>
-                </div>
-                <div class="y2k-card p-5 rounded-2xl">
-                    <span class="block text-xs text-zinc-400 uppercase font-bold mb-1">Total Items Sold</span>
-                    <p id="kpi-items" class="text-2xl font-black text-white">0 Units</p>
-                </div>
-                <div class="y2k-card p-5 rounded-2xl">
-                    <span class="block text-xs text-zinc-400 uppercase font-bold mb-1">Avg Order Value</span>
-                    <p id="kpi-aov" class="text-2xl font-black text-white">0 DZD</p>
-                </div>
-                <div class="y2k-card p-5 rounded-2xl">
-                    <span class="block text-xs text-zinc-400 uppercase font-bold mb-1">Est. Monthly Average</span>
-                    <p id="kpi-avg-month" class="text-2xl font-black text-purple-400">0 DZD</p>
-                </div>
+            <div class="sm:col-span-2 md:col-span-2">
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Image URL *</label>
+                <input type="url" id="p-image" required placeholder="https://..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
             </div>
-
-            <!-- Revenue Visual Graph -->
-            <div class="y2k-card p-6 rounded-2xl">
-                <h3 class="text-sm font-bold text-zinc-300 uppercase mb-4">Revenue Trend Chart</h3>
-                <div class="h-80 w-full">
-                    <canvas id="salesChart"></canvas>
-                </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Category / Tag</label>
+                <input type="text" id="p-category" placeholder="e.g. Hoodies, T-Shirts" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
             </div>
-
-            <!-- Top Selling Items Table -->
-            <div class="y2k-card p-6 rounded-2xl">
-                <h3 class="text-sm font-bold text-zinc-300 uppercase mb-4">Top Sold Items</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-zinc-300">
-                        <thead class="text-xs uppercase bg-zinc-950 text-zinc-500 border-b border-zinc-800">
-                            <tr>
-                                <th class="p-3">Product Name</th>
-                                <th class="p-3">Quantity Sold</th>
-                                <th class="p-3">Generated Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody id="top-products-tbody">
-                            <tr><td colspan="3" class="text-center py-6 text-zinc-600">No sales data recorded yet.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="sm:col-span-2 md:col-span-3">
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Description</label>
+                <textarea id="p-desc" rows="2" placeholder="Item condition, fit specifications, material..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"></textarea>
             </div>
-        </section>
-
-    </main>
-
-    <!-- Edit Product Modal -->
-    <div id="edit-product-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 relative">
-            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-xl font-bold">&times;</button>
-            <h3 class="text-xl font-black text-white mb-4">Edit Product Details</h3>
-
-            <form id="edit-product-form" onsubmit="handleSaveEditProduct(event)" class="space-y-4">
-                <input type="hidden" id="edit-prod-id">
-                
-                <div>
-                    <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Title</label>
-                    <input type="text" id="edit-prod-title" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Price (DZD)</label>
-                    <input type="number" id="edit-prod-price" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Size</label>
-                        <select id="edit-prod-size" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white">
-                            <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="XXL">XXL</option><option value="Oversized / Free Size">Oversized / Free Size</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Availability</label>
-                        <select id="edit-prod-available" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white">
-                            <option value="true">In Stock</option>
-                            <option value="false">Sold Out</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full y2k-btn py-3 rounded-lg text-white font-black uppercase text-sm mt-2">
-                    Save Changes
+            <div class="sm:col-span-2 md:col-span-3">
+                <button type="submit" id="add-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3 rounded-xl transition">
+                    Upload & Publish Product
                 </button>
-            </form>
-        </div>
+            </div>
+        </form>
+    </section>
+
+    <!-- Navigation Tabs for Orders and Catalog -->
+    <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
+        <button id="tab-btn-local" onclick="switchAdminTab('local')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition">
+            📦 In-Stock Orders (<span id="tab-count-local">0</span>)
+        </button>
+        <button id="tab-btn-imports" onclick="switchAdminTab('imports')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
+            ✈️ Global Import Requests (<span id="tab-count-imports">0</span>)
+        </button>
+        <button id="tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
+            🏷️ Manage Inventory (<span id="tab-count-products">0</span>)
+        </button>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- Tab 1: In-Stock Orders -->
+    <section id="tab-view-local" class="space-y-4">
+        <h2 class="text-lg font-bold uppercase text-zinc-200">Local Inventory Orders</h2>
+        <div class="overflow-x-auto admin-card rounded-2xl">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                    <tr>
+                        <th class="p-4">Order ID</th>
+                        <th class="p-4">Customer Name</th>
+                        <th class="p-4">Phone</th>
+                        <th class="p-4">Location</th>
+                        <th class="p-4">Address</th>
+                        <th class="p-4">Product ID</th>
+                        <th class="p-4">Date</th>
+                        <th class="p-4 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-local-orders" class="divide-y divide-zinc-800">
+                    <tr><td colspan="8" class="p-4 text-center text-zinc-500">Loading local orders...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Tab 2: Global Import Requests -->
+    <section id="tab-view-imports" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold uppercase text-zinc-200">AliExpress / Shein / Temu Custom Import Orders</h2>
+        <div class="overflow-x-auto admin-card rounded-2xl">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                    <tr>
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Customer Name</th>
+                        <th class="p-4">Phone</th>
+                        <th class="p-4">Location & Address</th>
+                        <th class="p-4">Calculated Price / Details</th>
+                        <th class="p-4">Product Link</th>
+                        <th class="p-4 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-import-orders" class="divide-y divide-zinc-800">
+                    <tr><td colspan="7" class="p-4 text-center text-zinc-500">Loading import requests...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Tab 3: Inventory / Product List Management -->
+    <section id="tab-view-products" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold uppercase text-zinc-200">Active Inventory Drops</h2>
+        <div class="overflow-x-auto admin-card rounded-2xl">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                    <tr>
+                        <th class="p-4">Image</th>
+                        <th class="p-4">Title</th>
+                        <th class="p-4">Size</th>
+                        <th class="p-4">Price</th>
+                        <th class="p-4">ID</th>
+                        <th class="p-4 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-products" class="divide-y divide-zinc-800">
+                    <tr><td colspan="6" class="p-4 text-center text-zinc-500">Loading product list...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <script>
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let cachedOrders = [];
-        let cachedProducts = [];
-        let salesChartInstance = null;
+        let localOrdersList = [];
+        let importOrdersList = [];
+        let productsList = [];
 
-        // Set Current Month & Year in Filter Dropdowns
-        const todayDate = new Date();
-        document.getElementById('filter-month').value = todayDate.getMonth();
-        document.getElementById('filter-year').value = todayDate.getFullYear();
+        function switchAdminTab(tab) {
+            const btnLocal = document.getElementById('tab-btn-local');
+            const btnImports = document.getElementById('tab-btn-imports');
+            const btnProducts = document.getElementById('tab-btn-products');
 
-        // Switch Active Tab
-        function switchTab(tabId) {
-            ['tab-orders', 'tab-products', 'tab-analytics'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const viewLocal = document.getElementById('tab-view-local');
+            const viewImports = document.getElementById('tab-view-imports');
+            const viewProducts = document.getElementById('tab-view-products');
 
-            document.getElementById(tabId).classList.remove('hidden');
-            document.getElementById(`btn-${tabId}`).classList.add('active');
+            const activeClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition";
+            const inactiveClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition";
 
-            if (tabId === 'tab-analytics') {
-                updateAnalytics();
-            }
+            btnLocal.className = tab === 'local' ? activeClass : inactiveClass;
+            btnImports.className = tab === 'imports' ? activeClass : inactiveClass;
+            btnProducts.className = tab === 'products' ? activeClass : inactiveClass;
+
+            viewLocal.classList.toggle('hidden', tab !== 'local');
+            viewImports.classList.toggle('hidden', tab !== 'imports');
+            viewProducts.classList.toggle('hidden', tab !== 'products');
         }
 
-        // Fetch & Load Orders
-        async function loadOrders() {
-            const container = document.getElementById('orders-container');
-            const { data, error } = await _supabase
-                .from('orders')
-                .select('*, products(title, price)')
-                .order('id', { ascending: false });
+        async function fetchAdminData() {
+            await Promise.all([fetchOrders(), fetchProducts()]);
+        }
+
+        async function fetchOrders() {
+            const { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
 
             if (error) {
-                container.innerHTML = `<p class="text-red-400 text-center py-8">Failed to fetch orders.</p>`;
+                console.error("Error fetching orders:", error);
                 return;
             }
 
-            cachedOrders = data || [];
-            document.getElementById('orders-count').textContent = cachedOrders.length;
+            localOrdersList = data.filter(o => !o.import_url);
+            importOrdersList = data.filter(o => o.import_url);
 
-            if (cachedOrders.length === 0) {
-                container.innerHTML = `<p class="text-zinc-500 text-center py-12 font-semibold">No orders placed yet.</p>`;
+            document.getElementById('stat-local-orders').textContent = localOrdersList.length;
+            document.getElementById('stat-import-orders').textContent = importOrdersList.length;
+            document.getElementById('stat-total-orders').textContent = data.length;
+
+            document.getElementById('tab-count-local').textContent = localOrdersList.length;
+            document.getElementById('tab-count-imports').textContent = importOrdersList.length;
+
+            renderLocalOrders();
+            renderImportOrders();
+        }
+
+        function renderLocalOrders() {
+            const tbody = document.getElementById('table-local-orders');
+            if (localOrdersList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-zinc-500 font-bold">No standard in-stock orders.</td></tr>`;
                 return;
             }
 
-            container.innerHTML = cachedOrders.map(o => {
-                const mapLink = o.coordinates ? `https://www.google.com/maps?q=${o.coordinates}` : null;
-                const prodTitle = o.products ? o.products.title : 'Deleted Product';
-                const prodPrice = o.products ? o.products.price : 0;
+            tbody.innerHTML = localOrdersList.map(o => `
+                <tr class="hover:bg-zinc-900/60 transition">
+                    <td class="p-4 font-bold text-red-500">#${o.id}</td>
+                    <td class="p-4 font-bold text-white">${o.customer_name}</td>
+                    <td class="p-4 font-mono">${o.phone_number}</td>
+                    <td class="p-4">${o.wilaya} (${o.commune})</td>
+                    <td class="p-4 text-zinc-400">${o.address || '-'}</td>
+                    <td class="p-4 font-mono text-zinc-300">Item #${o.product_id}</td>
+                    <td class="p-4 text-zinc-500">${new Date(o.created_at || Date.now()).toLocaleDateString()}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteOrder(${o.id})" class="text-xs bg-red-950 text-red-400 border border-red-800 px-2.5 py-1 rounded hover:bg-red-900 transition">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderImportOrders() {
+            const tbody = document.getElementById('table-import-orders');
+            if (importOrdersList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-zinc-500 font-bold">No custom import requests.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = importOrdersList.map(o => {
+                const parts = o.import_url.split(' | ');
+                const rawUrl = parts[0];
+                const priceTag = parts[1] || 'N/A';
 
                 return `
-                    <div class="y2k-card p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-purple-950 text-purple-300 text-xs px-2.5 py-0.5 rounded border border-purple-800 font-bold">Order #${o.id}</span>
-                                <span class="text-zinc-400 text-xs">${new Date(o.created_at || Date.now()).toLocaleString()}</span>
-                            </div>
-                            <h3 class="text-white font-bold text-lg">${o.customer_name} <span class="text-zinc-400 font-normal text-sm">(${o.phone_number})</span></h3>
-                            <p class="text-purple-400 text-sm font-semibold">Item: ${prodTitle} (${prodPrice} DZD)</p>
-                            <p class="text-zinc-300 text-xs">📍 ${o.wilaya} | ${o.commune} - ${o.address}</p>
-                            ${mapLink ? `<a href="${mapLink}" target="_blank" class="inline-block text-xs text-purple-400 hover:underline">🗺️ View Map Coordinates</a>` : ''}
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="deleteOrder(${o.id})" class="bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800/60 px-4 py-2 rounded-lg text-xs font-bold transition">
-                                Delete Order
-                            </button>
-                        </div>
-                    </div>
+                    <tr class="hover:bg-zinc-900/60 transition">
+                        <td class="p-4 font-bold text-red-500">#${o.id}</td>
+                        <td class="p-4 font-bold text-white">${o.customer_name}</td>
+                        <td class="p-4 font-mono">${o.phone_number}</td>
+                        <td class="p-4">${o.wilaya}, ${o.commune}<br><span class="text-zinc-500">${o.address}</span></td>
+                        <td class="p-4 font-bold text-amber-400">${priceTag}</td>
+                        <td class="p-4">
+                            <a href="${rawUrl}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-red-950 text-red-400 border border-red-800 px-3 py-1.5 rounded-lg font-bold hover:bg-red-900 transition">
+                                🔗 View Item
+                            </a>
+                        </td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteOrder(${o.id})" class="text-xs bg-red-950 text-red-400 border border-red-800 px-2.5 py-1 rounded hover:bg-red-900 transition">Delete</button>
+                        </td>
+                    </tr>
                 `;
             }).join('');
         }
 
-        async function deleteOrder(id) {
-            if (!confirm("Are you sure you want to delete this order?")) return;
-            await _supabase.from('orders').delete().eq('id', id);
-            loadOrders();
-        }
-
-        // Fetch & Load Products
-        async function loadProducts() {
-            const container = document.getElementById('products-list-container');
+        async function fetchProducts() {
             const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: false });
 
             if (error) {
-                container.innerHTML = `<p class="text-red-400 col-span-full">Failed to load inventory.</p>`;
+                console.error("Error fetching products:", error);
                 return;
             }
 
-            cachedProducts = data || [];
-            document.getElementById('products-count').textContent = cachedProducts.length;
+            productsList = data;
+            document.getElementById('stat-products').textContent = productsList.length;
+            document.getElementById('tab-count-products').textContent = productsList.length;
 
-            container.innerHTML = cachedProducts.map(p => `
-                <div class="y2k-card p-4 rounded-xl flex flex-col justify-between">
-                    <div>
-                        <div class="h-40 bg-zinc-950 rounded-lg overflow-hidden mb-3">
-                            <img src="${p.image_url || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover">
-                        </div>
-                        <div class="flex justify-between items-start mb-1">
-                            <h4 class="font-bold text-white text-base">${p.title}</h4>
-                            <span class="text-xs bg-zinc-800 text-purple-300 px-2 py-0.5 rounded font-bold">${p.size}</span>
-                        </div>
-                        <p class="text-purple-400 font-bold text-sm mb-2">${p.price} DZD</p>
-                    </div>
-                    <div class="flex items-center justify-between border-t border-zinc-800/80 pt-3 mt-2">
-                        <span class="text-xs ${p.is_available ? 'text-green-400' : 'text-red-400'} font-bold">
-                            ${p.is_available ? 'In Stock' : 'Sold Out'}
-                        </span>
-                        <div class="flex gap-2">
-                            <button onclick="openEditModal(${p.id})" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1 rounded text-xs font-bold transition">Edit</button>
-                            <button onclick="deleteProduct(${p.id})" class="bg-red-950 text-red-300 px-3 py-1 rounded text-xs font-bold transition">Delete</button>
-                        </div>
-                    </div>
-                </div>
+            const tbody = document.getElementById('table-products');
+            if (productsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-zinc-500 font-bold">No products in database.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = productsList.map(p => `
+                <tr class="hover:bg-zinc-900/60 transition">
+                    <td class="p-4">
+                        <img src="${p.image_url || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-lg border border-zinc-700">
+                    </td>
+                    <td class="p-4 font-bold text-white">${p.title}</td>
+                    <td class="p-4"><span class="bg-zinc-800 text-zinc-300 font-bold px-2 py-0.5 rounded">${p.size}</span></td>
+                    <td class="p-4 font-bold text-red-400">${p.price} DZD</td>
+                    <td class="p-4 font-mono text-zinc-500">#${p.id}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteProduct(${p.id})" class="text-xs bg-red-950 text-red-400 border border-red-800 px-2.5 py-1 rounded hover:bg-red-900 transition">Remove</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        // Create New Product
-        async function handleCreateProduct(e) {
+        async function handleAddProduct(e) {
             e.preventDefault();
-            const btn = document.getElementById('prod-submit-btn');
+            const btn = document.getElementById('add-btn');
             btn.disabled = true;
-            btn.textContent = "Publishing...";
-
-            const fileInput = document.getElementById('prod-file');
-            let imageUrl = '';
-
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-                const { data, error } = await _supabase.storage.from('product-images').upload(fileName, file);
-
-                if (!error) {
-                    const publicUrlRes = _supabase.storage.from('product-images').getPublicUrl(fileName);
-                    imageUrl = publicUrlRes.data.publicUrl;
-                }
-            }
+            btn.textContent = "Publishing Drop...";
 
             const newProduct = {
-                title: document.getElementById('prod-title').value,
-                price: parseFloat(document.getElementById('prod-price').value),
-                size: document.getElementById('prod-size').value,
-                category: document.getElementById('prod-category').value,
-                image_url: imageUrl,
-                is_available: true
+                title: document.getElementById('p-title').value,
+                price: parseFloat(document.getElementById('p-price').value),
+                size: document.getElementById('p-size').value,
+                image_url: document.getElementById('p-image').value,
+                description: document.getElementById('p-desc').value + (document.getElementById('p-category').value ? ` [Category: ${document.getElementById('p-category').value}]` : '')
             };
 
             const { error } = await _supabase.from('products').insert([newProduct]);
 
             if (error) {
-                alert("Error adding product: " + error.message);
+                alert("Failed to create product: " + error.message);
             } else {
-                alert("Product published successfully!");
+                alert("New drop added successfully!");
                 document.getElementById('add-product-form').reset();
-                loadProducts();
+                fetchProducts();
             }
 
             btn.disabled = false;
-            btn.textContent = "Publish Product";
+            btn.textContent = "Upload & Publish Product";
         }
 
-        // Edit Product Modal
-        function openEditModal(id) {
-            const p = cachedProducts.find(item => item.id === id);
-            if (!p) return;
-
-            document.getElementById('edit-prod-id').value = p.id;
-            document.getElementById('edit-prod-title').value = p.title;
-            document.getElementById('edit-prod-price').value = p.price;
-            document.getElementById('edit-prod-size').value = p.size;
-            document.getElementById('edit-prod-available').value = p.is_available ? "true" : "false";
-
-            document.getElementById('edit-product-modal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('edit-product-modal').classList.add('hidden');
-        }
-
-        async function handleSaveEditProduct(e) {
-            e.preventDefault();
-            const id = document.getElementById('edit-prod-id').value;
-
-            const updates = {
-                title: document.getElementById('edit-prod-title').value,
-                price: parseFloat(document.getElementById('edit-prod-price').value),
-                size: document.getElementById('edit-prod-size').value,
-                is_available: document.getElementById('edit-prod-available').value === "true"
-            };
-
-            const { error } = await _supabase.from('products').update(updates).eq('id', id);
-
-            if (error) {
-                alert("Failed to update product.");
-            } else {
-                closeEditModal();
-                loadProducts();
-            }
+        async function deleteOrder(id) {
+            if (!confirm(`Are you sure you want to delete order #${id}?`)) return;
+            const { error } = await _supabase.from('orders').delete().eq('id', id);
+            if (error) alert("Could not delete order: " + error.message);
+            else fetchOrders();
         }
 
         async function deleteProduct(id) {
-            if (!confirm("Are you sure you want to delete this product?")) return;
-            await _supabase.from('products').delete().eq('id', id);
-            loadProducts();
+            if (!confirm(`Are you sure you want to delete product #${id}?`)) return;
+            const { error } = await _supabase.from('products').delete().eq('id', id);
+            if (error) alert("Could not delete product: " + error.message);
+            else fetchProducts();
         }
 
-        // Analytics Engine & Chart Rendering
-        async function updateAnalytics() {
-            if (cachedOrders.length === 0) await loadOrders();
-
-            const timeframe = document.getElementById('chart-timeframe').value;
-            const selectedMonth = parseInt(document.getElementById('filter-month').value);
-            const selectedYear = parseInt(document.getElementById('filter-year').value);
-
-            let totalRev = 0;
-            let totalItems = cachedOrders.length;
-            let productSalesCount = {};
-
-            const labels = [];
-            const dataPoints = [];
-
-            if (timeframe === 'today') {
-                for (let h = 0; h < 24; h += 3) labels.push(`${h}:00`);
-                dataPoints.fill(0, 0, 8);
-            } else if (timeframe === 'month') {
-                const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
-                for (let d = 1; d <= daysInMonth; d++) {
-                    labels.push(`Day ${d}`);
-                    dataPoints.push(0);
-                }
-            } else {
-                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                monthNames.forEach(m => {
-                    labels.push(m);
-                    dataPoints.push(0);
-                });
-            }
-
-            cachedOrders.forEach(o => {
-                const orderDate = new Date(o.created_at || Date.now());
-                const price = o.products ? o.products.price : 0;
-                const title = o.products ? o.products.title : 'Unknown Product';
-
-                totalRev += price;
-                productSalesCount[title] = (productSalesCount[title] || 0) + 1;
-
-                if (timeframe === 'month' && orderDate.getMonth() === selectedMonth && orderDate.getFullYear() === selectedYear) {
-                    const dayIdx = orderDate.getDate() - 1;
-                    if (dataPoints[dayIdx] !== undefined) dataPoints[dayIdx] += price;
-                } else if (timeframe === 'year' && orderDate.getFullYear() === selectedYear) {
-                    const monthIdx = orderDate.getMonth();
-                    if (dataPoints[monthIdx] !== undefined) dataPoints[monthIdx] += price;
-                } else if (timeframe === 'today') {
-                    const today = new Date();
-                    if (orderDate.toDateString() === today.toDateString()) {
-                        const slot = Math.floor(orderDate.getHours() / 3);
-                        if (dataPoints[slot] !== undefined) dataPoints[slot] += price;
-                    }
-                }
-            });
-
-            // Update KPI Cards
-            document.getElementById('kpi-revenue').textContent = `${totalRev.toLocaleString()} DZD`;
-            document.getElementById('kpi-items').textContent = `${totalItems} Units`;
-            document.getElementById('kpi-aov').textContent = totalItems > 0 ? `${Math.round(totalRev / totalItems).toLocaleString()} DZD` : '0 DZD';
-            document.getElementById('kpi-avg-month').textContent = `${Math.round(totalRev / 12).toLocaleString()} DZD`;
-
-            // Top Products Table
-            const tbody = document.getElementById('top-products-tbody');
-            const sortedItems = Object.entries(productSalesCount).sort((a, b) => b[1] - a[1]);
-
-            if (sortedItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-zinc-600">No sales recorded yet.</td></tr>`;
-            } else {
-                tbody.innerHTML = sortedItems.map(([name, qty]) => `
-                    <tr class="border-b border-zinc-800/50">
-                        <td class="p-3 font-semibold text-white">${name}</td>
-                        <td class="p-3 text-purple-400 font-bold">${qty}</td>
-                        <td class="p-3 text-zinc-300">${qty * (cachedProducts.find(p => p.title === name)?.price || 0)} DZD</td>
-                    </tr>
-                `).join('');
-            }
-
-            // Draw Chart
-            renderChart(labels, dataPoints);
-        }
-
-        function renderChart(labels, data) {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            if (salesChartInstance) salesChartInstance.destroy();
-
-            salesChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Revenue (DZD)',
-                        data: data,
-                        borderColor: '#a855f7',
-                        backgroundColor: 'rgba(168, 85, 247, 0.15)',
-                        fill: true,
-                        tension: 0.35,
-                        borderWidth: 2,
-                        pointBackgroundColor: '#c084fc'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a1a1aa' } },
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a1a1aa' } }
-                    }
-                }
-            });
-        }
-
-        // Initialize Admin Dashboard
-        loadOrders();
-        loadProducts();
+        fetchAdminData();
     </script>
 </body>
 </html>
