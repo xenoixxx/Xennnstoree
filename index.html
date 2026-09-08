@@ -106,7 +106,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Wilaya *</label>
-                        <select id="import-wilaya" required onchange="updateWilayaDeliveryFee()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                        <select id="import-wilaya" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
                             <option value="">Select Wilaya</option>
                         </select>
                     </div>
@@ -119,10 +119,9 @@
                         <input type="text" id="import-address" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
                     </div>
 
-                    <!-- Delivery Rate Preview -->
                     <div class="md:col-span-2 bg-red-50 border border-red-200 rounded-xl p-4 flex justify-between items-center text-sm">
-                        <span class="font-bold text-zinc-700 uppercase text-xs">Estimated Delivery Fee:</span>
-                        <span id="import-delivery-fee" class="font-black text-red-600">Select Wilaya</span>
+                        <span class="font-bold text-zinc-700 uppercase text-xs">Shipping Fee:</span>
+                        <span class="font-bold text-red-600 text-xs">Calculated upon confirmation</span>
                     </div>
 
                     <div class="md:col-span-2">
@@ -139,15 +138,6 @@
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Placeholder Wilaya Fees (Easily updated when you send the screenshots)
-        const wilayaFees = {
-            "16 - Algiers": 400,
-            "09 - Blida": 500,
-            "31 - Oran": 600,
-            "25 - Constantine": 600,
-            "Default": 800
-        };
 
         function initWilayas() {
             const select = document.getElementById('import-wilaya');
@@ -167,12 +157,6 @@
             ];
             select.innerHTML = `<option value="">Select Wilaya</option>` + 
                 wilayas.map(w => `<option value="${w}">${w}</option>`).join('');
-        }
-
-        function updateWilayaDeliveryFee() {
-            const w = document.getElementById('import-wilaya').value;
-            const fee = wilayaFees[w] || wilayaFees["Default"];
-            document.getElementById('import-delivery-fee').textContent = w ? `${fee} DZD` : 'Select Wilaya';
         }
 
         function updateCartBadge() {
@@ -216,18 +200,15 @@
             btn.disabled = true;
             btn.textContent = "Submitting...";
 
-            const wilaya = document.getElementById('import-wilaya').value;
-            const deliveryFee = wilayaFees[wilaya] || wilayaFees["Default"];
-
             const order = {
                 product_id: null,
                 customer_name: document.getElementById('import-name').value,
                 phone_number: document.getElementById('import-phone').value,
-                wilaya: wilaya,
+                wilaya: document.getElementById('import-wilaya').value,
                 commune: document.getElementById('import-commune').value,
                 address: document.getElementById('import-address').value,
                 import_url: document.getElementById('import-url').value,
-                delivery_fee: deliveryFee
+                delivery_fee: 0
             };
 
             const { error } = await _supabase.from('orders').insert([order]);
@@ -235,7 +216,7 @@
             if (error) {
                 alert("Failed to submit request: " + error.message);
             } else {
-                alert("Import order submitted successfully! We will contact you on WhatsApp / Phone shortly.");
+                alert("Import order submitted successfully! We will contact you shortly with the full price and delivery details.");
                 document.getElementById('import-order-form').reset();
             }
 
