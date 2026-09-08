@@ -120,11 +120,11 @@
 
                 <div>
                     <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Full Name</label>
-                    <input type="text" id="cust-name" required placeholder="e.g. Karim Belkacem" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    <input type="text" id="cust-name" required id="cust-name-input" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Phone Number</label>
-                    <input type="tel" id="cust-phone" required placeholder="e.g. 0550123456" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    <input type="tel" id="cust-phone" required id="cust-phone-input" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -134,23 +134,23 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Commune / District</label>
-                        <input type="text" id="cust-commune" required placeholder="e.g. Bab Ezzouar" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                        <input type="text" id="cust-commune" required id="cust-commune-input" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Street Address</label>
-                    <textarea id="cust-address" required placeholder="e.g. Cité 1000 Logements, Bâtiment B, N° 12" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"></textarea>
+                    <label class="block text-xs font-bold text-zinc-400 mb-1 uppercase">Street Address / Landmark</label>
+                    <textarea id="cust-address" required id="cust-address-input" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"></textarea>
                 </div>
 
                 <!-- Pin Location on Map -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-bold text-zinc-400 uppercase">Pin Exact Delivery Spot</label>
-                        <button type="button" onclick="locateUser()" class="text-xs text-purple-400 hover:underline">📍 Use My GPS</button>
+                        <label class="block text-xs font-bold text-zinc-400 uppercase">Pin Exact Delivery Location</label>
+                        <button type="button" onclick="locateUser()" class="text-xs text-purple-400 hover:underline">📍 Detect My GPS</button>
                     </div>
                     <div id="map" class="border border-zinc-800"></div>
-                    <p id="location-status" class="text-[11px] text-zinc-500 mt-1">Tap/click the map or drag marker to set precise drop point.</p>
+                    <p id="location-status" class="text-[11px] text-zinc-500 mt-1">Click/tap on map or drag marker to set precise drop-off point.</p>
                 </div>
 
                 <button type="submit" id="submit-btn" class="w-full y2k-btn py-3 text-white font-black rounded-lg uppercase tracking-wider text-sm mt-2">
@@ -207,6 +207,23 @@
         let allProducts = [];
         let activeCategory = 'all';
         let map, marker;
+
+        // Randomized Placeholder Generator
+        const sampleNames = ["Karim B.", "Yacine M.", "Sofiane K.", "Anis R.", "Walid H.", "Mehdi Z."];
+        const samplePhones = ["0550123456", "0661987654", "0770456789", "0552334455", "0665112233"];
+        const sampleCommunes = ["Bab Ezzouar", "Zéralda", "El Biar", "Bouzaréah", "Dar El Beïda", "Hydra"];
+        const sampleAddresses = ["Rue Pasteur, N° 14", "Cité 1000 Logements, Bât B", "Boulevard Colonel Amirouche", "Cité Ezzouhour, Villa 08"];
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function setRandomPlaceholders() {
+            document.getElementById('cust-name').placeholder = `e.g. ${getRandomElement(sampleNames)}`;
+            document.getElementById('cust-phone').placeholder = `e.g. ${getRandomElement(samplePhones)}`;
+            document.getElementById('cust-commune').placeholder = `e.g. ${getRandomElement(sampleCommunes)}`;
+            document.getElementById('cust-address').placeholder = `e.g. ${getRandomElement(sampleAddresses)}`;
+        }
 
         const wilayas = [
             "1 - Adrar", "2 - Chlef", "3 - Laghouat", "4 - Oum El Bouaghi", "5 - Batna", "6 - Béjaïa", "7 - Biskra",
@@ -299,10 +316,10 @@
             `).join('');
         }
 
-        // Initialize Map in Checkout Modal
+        // Map Setup
         function initMap() {
             if (map) return;
-            const defaultLat = 36.7538; // Algiers central coordinates
+            const defaultLat = 36.7538;
             const defaultLng = 3.0588;
 
             map = L.map('map').setView([defaultLat, defaultLng], 11);
@@ -343,6 +360,7 @@
         }
 
         function openCheckout(id, title) {
+            setRandomPlaceholders();
             document.getElementById('selected-product-id').value = id;
             document.getElementById('modal-product-title').textContent = title;
             document.getElementById('checkout-modal').classList.remove('hidden');
