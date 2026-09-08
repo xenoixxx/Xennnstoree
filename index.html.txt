@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xennnstoree ✦ Y2K & Alternative Clothing</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #0b0b0d; color: #e5e7eb; font-family: sans-serif; }
+        .y2k-border { border: 1px solid #27272a; }
+        .y2k-border:hover { border-color: #a855f7; }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-extrabold tracking-wider text-purple-500 uppercase">xennnstoree ✦</h1>
+            <span class="text-xs bg-zinc-800 text-zinc-300 px-3 py-1 rounded-full border border-zinc-700">🚚 Delivery 58 Wilayas</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 mt-8">
+        <!-- Hero Tagline -->
+        <div class="text-center my-8">
+            <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tight text-white">Y2K & RETRO ARCHIVE</h2>
+            <p class="text-zinc-400 mt-2 text-sm md:text-base">Exclusive street drops. Fast cash-on-delivery shipping across Algeria.</p>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <p class="text-zinc-500 col-span-full text-center py-12">Loading collection...</p>
+        </div>
+    </main>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 w-full max-w-md relative">
+            <button onclick="closeCheckout()" class="absolute top-4 right-4 text-zinc-400 hover:text-white">✕</button>
+            <h3 class="text-xl font-bold text-white mb-1">Confirm Order</h3>
+            <p id="modal-product-title" class="text-purple-400 text-sm mb-4 font-semibold"></p>
+
+            <form id="order-form" onsubmit="handleOrderSubmit(event)" class="space-y-4">
+                <input type="hidden" id="selected-product-id">
+                
+                <div>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">Full Name</label>
+                    <input type="text" id="cust-name" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" placeholder="e.g. Karim B.">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">Phone Number</label>
+                    <input type="tel" id="cust-phone" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" placeholder="06XX XX XX XX">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">Wilaya</label>
+                    <select id="cust-wilaya" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                        <option value="">Select Wilaya</option>
+                        <!-- 58 Wilayas will be injected via JS -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">Address / Commune</label>
+                    <input type="text" id="cust-address" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" placeholder="Street address or commune">
+                </div>
+
+                <button type="submit" id="submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg text-sm transition mt-2">
+                    Submit Order (Cash on Delivery)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Supabase Initialization
+        const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Algerian 58 Wilayas List
+        const wilayas = [
+            "1 - Adrar", "2 - Chlef", "3 - Laghouat", "4 - Oum El Bouaghi", "5 - Batna", "6 - Béjaïa", "7 - Biskra",
+            "8 - Béchar", "9 - Blida", "10 - Bouira", "11 - Tamanrasset", "12 - Tébessa", "13 - Tlemcen", "14 - Tiaret",
+            "15 - Tizi Ouzou", "16 - Algiers", "17 - Djelfa", "18 - Jijel", "19 - Sétif", "20 - Saïda", "21 - Skikda",
+            "22 - Sidi Bel Abbès", "23 - Annaba", "24 - Guelma", "25 - Constantine", "26 - Médéa", "27 - Mostaganem",
+            "28 - M'Sila", "29 - Mascara", "30 - Ouargla", "31 - Oran", "32 - El Bayadh", "33 - Illizi", "34 - Bordj Bou Arréridj",
+            "35 - Boumerdès", "36 - El Tarf", "37 - Tindouf", "38 - Tissemsilt", "39 - El Oued", "40 - Khenchela",
+            "41 - Souk Ahras", "42 - Tipaza", "43 - Mila", "44 - Aïn Defla", "45 - Naâma", "46 - Aïn Témouchent",
+            "47 - Ghardaïa", "48 - Relizane", "49 - El M'Ghair", "50 - El Meniaa", "51 - Ouled Djellal", "52 - Bordj Baji Mokhtar",
+            "53 - Béni Abbès", "54 - Timimoun", "55 - Touggourt", "56 - Djanet", "57 - In Salah", "58 - In Guezzam"
+        ];
+
+        // Populate Wilaya Select Dropdown
+        const wilayaSelect = document.getElementById('cust-wilaya');
+        wilayas.forEach(w => {
+            const opt = document.createElement('option');
+            opt.value = w;
+            opt.textContent = w;
+            wilayaSelect.appendChild(opt);
+        });
+
+        // Fetch & Render Products
+        async function fetchProducts() {
+            const grid = document.getElementById('product-grid');
+            const { data: products, error } = await supabase.from('products').select('*').order('id', { ascending: false });
+
+            if (error) {
+                grid.innerHTML = `<p class="text-red-400 col-span-full text-center">Error loading products.</p>`;
+                return;
+            }
+
+            if (!products || products.length === 0) {
+                grid.innerHTML = `<p class="text-zinc-500 col-span-full text-center py-12">No items listed yet. Check back soon!</p>`;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div class="bg-zinc-900 rounded-xl overflow-hidden y2k-border transition flex flex-col justify-between">
+                    <div>
+                        <div class="h-64 bg-zinc-950 overflow-hidden relative">
+                            <img src="${p.image_url || 'https://via.placeholder.com/400x500?text=No+Photo'}" alt="${p.title}" class="w-full h-full object-cover">
+                            ${!p.is_available ? `<span class="absolute top-2 right-2 bg-red-600/90 text-white text-xs font-bold px-2 py-1 rounded">SOLD OUT</span>` : ''}
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-white text-lg leading-snug">${p.title}</h3>
+                                <span class="bg-zinc-800 text-purple-400 text-xs font-bold px-2 py-1 rounded border border-zinc-700">${p.size}</span>
+                            </div>
+                            <p class="text-xl font-black text-white">${p.price} DZD</p>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0">
+                        <button 
+                            onclick="openCheckout(${p.id}, '${p.title.replace(/'/g, "\\'")}')" 
+                            ${!p.is_available ? 'disabled' : ''}
+                            class="w-full py-2.5 rounded-lg text-sm font-bold transition ${p.is_available ? 'bg-white text-black hover:bg-purple-500 hover:text-white' : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'}">
+                            ${p.is_available ? 'Order Now' : 'Out of Stock'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal Handlers
+        function openCheckout(productId, title) {
+            document.getElementById('selected-product-id').value = productId;
+            document.getElementById('modal-product-title').textContent = title;
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+            document.getElementById('order-form').reset();
+        }
+
+        // Submit Order to Supabase
+        async function handleOrderSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = "Processing...";
+
+            const orderData = {
+                product_id: parseInt(document.getElementById('selected-product-id').value),
+                customer_name: document.getElementById('cust-name').value,
+                phone_number: document.getElementById('cust-phone').value,
+                wilaya: document.getElementById('cust-wilaya').value,
+                address: document.getElementById('cust-address').value,
+                status: 'pending'
+            };
+
+            const { error } = await supabase.from('orders').insert([orderData]);
+
+            if (error) {
+                alert("Failed to submit order. Please try again.");
+                console.error(error);
+                btn.disabled = false;
+                btn.textContent = "Submit Order (Cash on Delivery)";
+            } else {
+                alert("Order placed successfully! We will contact you soon.");
+                closeCheckout();
+                btn.disabled = false;
+                btn.textContent = "Submit Order (Cash on Delivery)";
+            }
+        }
+
+        // Load Products on page open
+        fetchProducts();
+    </script>
+</body>
+</html>
