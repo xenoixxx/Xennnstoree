@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XENNNSTOREE | Your Basket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fafafa;
+            color: #09090b;
+            font-family: 'Space Grotesk', sans-serif;
+            background-image: radial-gradient(rgba(239, 68, 68, 0.12) 1px, transparent 0);
+            background-size: 28px 28px;
+        }
+        .y2k-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .y2k-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            transition: all 0.25s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <header class="bg-white/80 backdrop-blur-md border-b border-red-200 px-6 py-4 sticky top-0 z-40 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2">
+            <span class="text-2xl font-black tracking-tight text-zinc-950">XENNN<span class="text-red-600">STOREE</span></span>
+        </a>
+        <a href="index.html" class="text-xs font-bold text-zinc-600 hover:text-red-600 transition">&larr; Continue Shopping</a>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-10 w-full flex-grow space-y-8">
+        <h1 class="text-3xl font-black uppercase text-zinc-950">Your Basket</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Items -->
+            <div class="lg:col-span-2 space-y-4" id="cart-items-container">
+                <p class="text-zinc-500">Your basket is empty.</p>
+            </div>
+
+            <!-- Summary -->
+            <div class="y2k-card p-6 rounded-3xl h-fit space-y-6 border border-red-200">
+                <h2 class="text-xl font-black uppercase text-zinc-950">Order Summary</h2>
+
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between text-zinc-600">
+                        <span>Items Subtotal:</span>
+                        <span id="subtotal-price" class="font-bold text-zinc-950">0 DZD</span>
+                    </div>
+                    <div class="flex justify-between text-zinc-600">
+                        <span>Delivery Fee:</span>
+                        <span class="font-bold text-red-600 text-xs">Calculated on call</span>
+                    </div>
+                    <div class="flex justify-between text-lg font-black border-t border-red-100 pt-3 text-zinc-950">
+                        <span>Items Total:</span>
+                        <span id="grand-total-price" class="text-red-600">0 DZD</span>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form id="checkout-form" onsubmit="handleCheckout(event)" class="space-y-3 pt-2">
+                    <input type="text" id="cust-name" required placeholder="Full Name" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
+                    <input type="tel" id="cust-phone" required placeholder="Phone Number" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
+                    
+                    <select id="cust-wilaya" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
+                        <option value="">Select Wilaya</option>
+                    </select>
+
+                    <input type="text" id="cust-commune" required placeholder="Commune" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
+                    <input type="text" id="cust-address" required placeholder="Street Address" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
+
+                    <button type="submit" id="checkout-btn" class="w-full y2k-btn py-3.5 rounded-xl text-white font-black uppercase text-xs tracking-wider">
+                        Confirm Purchase
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function initWilayas() {
+            const select = document.getElementById('cust-wilaya');
+            const wilayas = [
+                "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna", 
+                "06 - Béjaïa", "07 - Biskra", "08 - Béchar", "09 - Blida", "10 - Bouira", 
+                "11 - Tamanrasset", "12 - Tébessa", "13 - Tlemcen", "14 - Tiaret", "15 - Tizi Ouzou", 
+                "16 - Algiers", "17 - Djelfa", "18 - Jijel", "19 - Sétif", "20 - Saïda", 
+                "21 - Skikda", "22 - Sidi Bel Abbès", "23 - Annaba", "24 - Guelma", "25 - Constantine", 
+                "26 - Médéa", "27 - Mostaganem", "28 - M'Sila", "29 - Mascara", "30 - Ouargla", 
+                "31 - Oran", "32 - El Bayadh", "33 - Illizi", "34 - Bordj Bou Arréridj", "35 - Boumerdès", 
+                "36 - El Tarf", "37 - Tindouf", "38 - Tissemsilt", "39 - El Oued", "40 - Khenchela", 
+                "41 - Souk Ahras", "42 - Tipaza", "43 - Mila", "44 - Aïn Defla", "45 - Naâma", 
+                "46 - Aïn Témouchent", "47 - Ghardaïa", "48 - Relizane", "49 - El M'Ghair", "50 - El Meniaa", 
+                "51 - Ouled Djellal", "52 - Bordj Baji Mokhtar", "53 - Béni Abbès", "54 - Timimoun", 
+                "55 - Touggourt", "56 - Djanet", "57 - In Salah", "58 - In Guezzam"
+            ];
+            select.innerHTML = `<option value="">Select Wilaya</option>` + 
+                wilayas.map(w => `<option value="${w}">${w}</option>`).join('');
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const container = document.getElementById('cart-items-container');
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="y2k-card p-8 rounded-2xl text-center text-zinc-500 font-bold">Your basket is currently empty.</div>`;
+                calculateCartTotals();
+                return;
+            }
+
+            container.innerHTML = cart.map((item, idx) => `
+                <div class="y2k-card p-4 rounded-2xl flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="${item.image_url || 'https://via.placeholder.com/100'}" class="w-16 h-16 object-cover rounded-xl bg-zinc-100">
+                        <div>
+                            <h3 class="font-bold text-zinc-950 text-sm">${item.title}</h3>
+                            <p class="text-xs text-zinc-500">Size: ${item.size}</p>
+                            <p class="text-red-600 font-black text-sm">${item.price} DZD</p>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${idx})" class="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200">Remove</button>
+                </div>
+            `).join('');
+
+            calculateCartTotals();
+        }
+
+        function removeFromCart(index) {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function calculateCartTotals() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+
+            document.getElementById('subtotal-price').textContent = `${subtotal.toLocaleString()} DZD`;
+            document.getElementById('grand-total-price').textContent = `${subtotal.toLocaleString()} DZD`;
+        }
+
+        async function handleCheckout(e) {
+            e.preventDefault();
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+            if (cart.length === 0) {
+                alert("Your basket is empty!");
+                return;
+            }
+
+            const btn = document.getElementById('checkout-btn');
+            btn.disabled = true;
+            btn.textContent = "Processing Order...";
+
+            const ordersToInsert = cart.map(item => ({
+                product_id: item.id,
+                customer_name: document.getElementById('cust-name').value,
+                phone_number: document.getElementById('cust-phone').value,
+                wilaya: document.getElementById('cust-wilaya').value,
+                commune: document.getElementById('cust-commune').value,
+                address: document.getElementById('cust-address').value,
+                delivery_fee: 0
+            }));
+
+            const { error } = await _supabase.from('orders').insert(ordersToInsert);
+
+            if (error) {
+                alert("Error placing order: " + error.message);
+            } else {
+                alert("Order placed successfully! We will contact you soon to confirm order details.");
+                localStorage.removeItem('cart');
+                window.location.href = "index.html";
+            }
+
+            btn.disabled = false;
+            btn.textContent = "Confirm Purchase";
+        }
+
+        initWilayas();
+        renderCart();
+    </script>
+</body>
+</html>
