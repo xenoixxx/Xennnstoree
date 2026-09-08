@@ -12,179 +12,266 @@
         .admin-card { background: #18181b; border: 1px solid #27272a; }
     </style>
 </head>
-<body class="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
+<body class="min-h-screen flex flex-col justify-center items-center p-4 md:p-8">
 
-    <!-- Admin Header -->
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-4 gap-4">
-        <div>
-            <h1 class="text-3xl font-black text-red-500 uppercase tracking-tight">XENNNSTOREE <span class="text-white">ADMIN</span></h1>
-            <p class="text-xs text-zinc-400">Manage Drops, Catalog, Local Orders & Custom Imports</p>
+    <!-- Login Screen Section -->
+    <div id="login-screen" class="w-full max-w-md admin-card p-8 rounded-3xl space-y-6 shadow-2xl">
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-black text-red-500 uppercase tracking-tight">XENNN<span class="text-white">STOREE</span></h1>
+            <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider">Owner Portal Authentication</p>
         </div>
-        <div class="flex items-center gap-3">
-            <a href="index.html" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
-                🌐 View Storefront
-            </a>
-            <button onclick="fetchAdminData()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
-                🔄 Refresh Data
+
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Email Address *</label>
+                <input type="email" id="login-email" required placeholder="owner@xennnstoree.com" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 font-bold">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Password *</label>
+                <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 font-bold">
+            </div>
+
+            <div id="login-error" class="text-xs text-red-500 font-bold hidden text-center bg-red-950/50 border border-red-800 p-2.5 rounded-xl">
+                Invalid owner credentials. Please try again.
+            </div>
+
+            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3.5 rounded-xl transition shadow-lg shadow-red-900/30">
+                Sign In to Dashboard
             </button>
-        </div>
-    </header>
-
-    <!-- Overview Statistics -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="admin-card p-5 rounded-2xl">
-            <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Products</span>
-            <span class="text-3xl font-black text-white" id="stat-products">0</span>
-        </div>
-        <div class="admin-card p-5 rounded-2xl">
-            <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">In-Stock Orders</span>
-            <span class="text-3xl font-black text-emerald-400" id="stat-local-orders">0</span>
-        </div>
-        <div class="admin-card p-5 rounded-2xl">
-            <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Import Requests</span>
-            <span class="text-3xl font-black text-amber-400" id="stat-import-orders">0</span>
-        </div>
-        <div class="admin-card p-5 rounded-2xl">
-            <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Orders</span>
-            <span class="text-3xl font-black text-red-500" id="stat-total-orders">0</span>
-        </div>
-    </section>
-
-    <!-- Add New Product Form Section -->
-    <section class="admin-card p-6 rounded-3xl space-y-4">
-        <h2 class="text-xl font-black uppercase text-white flex items-center gap-2">
-            <span>➕</span> Add New Local Drop
-        </h2>
-        <form id="add-product-form" onsubmit="handleAddProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <div class="sm:col-span-2 md:col-span-1">
-                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Title / Name *</label>
-                <input type="text" id="p-title" required placeholder="e.g. Y2K Oversized Graphic Hoodie" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
-            </div>
-            <div>
-                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Price (DZD) *</label>
-                <input type="number" id="p-price" required placeholder="4500" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
-            </div>
-            <div>
-                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Size *</label>
-                <select id="p-size" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="XL" selected>XL</option>
-                    <option value="XXL">XXL</option>
-                    <option value="Oversized Fit">Oversized Fit</option>
-                </select>
-            </div>
-            <div class="sm:col-span-2 md:col-span-2">
-                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Image URL *</label>
-                <input type="url" id="p-image" required placeholder="https://..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
-            </div>
-            <div>
-                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Category / Tag</label>
-                <input type="text" id="p-category" placeholder="e.g. Hoodies, T-Shirts" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
-            </div>
-            <div class="sm:col-span-2 md:col-span-3">
-                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Description</label>
-                <textarea id="p-desc" rows="2" placeholder="Item condition, fit specifications, material..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"></textarea>
-            </div>
-            <div class="sm:col-span-2 md:col-span-3">
-                <button type="submit" id="add-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3 rounded-xl transition">
-                    Upload & Publish Product
-                </button>
-            </div>
         </form>
-    </section>
 
-    <!-- Navigation Tabs for Orders and Catalog -->
-    <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
-        <button id="tab-btn-local" onclick="switchAdminTab('local')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition">
-            📦 In-Stock Orders (<span id="tab-count-local">0</span>)
-        </button>
-        <button id="tab-btn-imports" onclick="switchAdminTab('imports')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
-            ✈️ Global Import Requests (<span id="tab-count-imports">0</span>)
-        </button>
-        <button id="tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
-            🏷️ Manage Inventory (<span id="tab-count-products">0</span>)
-        </button>
+        <div class="text-center">
+            <a href="index.html" class="text-xs text-zinc-500 hover:text-white underline">Return to Public Storefront</a>
+        </div>
     </div>
 
-    <!-- Tab 1: In-Stock Orders -->
-    <section id="tab-view-local" class="space-y-4">
-        <h2 class="text-lg font-bold uppercase text-zinc-200">Local Inventory Orders</h2>
-        <div class="overflow-x-auto admin-card rounded-2xl">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
-                    <tr>
-                        <th class="p-4">Order ID</th>
-                        <th class="p-4">Customer Name</th>
-                        <th class="p-4">Phone</th>
-                        <th class="p-4">Location</th>
-                        <th class="p-4">Address</th>
-                        <th class="p-4">Product ID</th>
-                        <th class="p-4">Date</th>
-                        <th class="p-4 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="table-local-orders" class="divide-y divide-zinc-800">
-                    <tr><td colspan="8" class="p-4 text-center text-zinc-500">Loading local orders...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+    <!-- Main Admin Dashboard (Hidden Until Authenticated) -->
+    <div id="admin-dashboard" class="w-full max-w-7xl mx-auto space-y-8 hidden">
 
-    <!-- Tab 2: Global Import Requests -->
-    <section id="tab-view-imports" class="space-y-4 hidden">
-        <h2 class="text-lg font-bold uppercase text-zinc-200">AliExpress / Shein / Temu Custom Import Orders</h2>
-        <div class="overflow-x-auto admin-card rounded-2xl">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
-                    <tr>
-                        <th class="p-4">ID</th>
-                        <th class="p-4">Customer Name</th>
-                        <th class="p-4">Phone</th>
-                        <th class="p-4">Location & Address</th>
-                        <th class="p-4">Calculated Price / Details</th>
-                        <th class="p-4">Product Link</th>
-                        <th class="p-4 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="table-import-orders" class="divide-y divide-zinc-800">
-                    <tr><td colspan="7" class="p-4 text-center text-zinc-500">Loading import requests...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+        <!-- Admin Header -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-4 gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-3xl font-black text-red-500 uppercase tracking-tight">XENNNSTOREE <span class="text-white">ADMIN</span></h1>
+                    <span class="bg-red-950 text-red-400 border border-red-800 text-[10px] font-black px-2 py-0.5 rounded uppercase" id="owner-tag">Amine (Owner)</span>
+                </div>
+                <p class="text-xs text-zinc-400">Manage Drops, Catalog, Local Orders & Custom Imports</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
+                    🌐 Storefront
+                </a>
+                <button onclick="fetchAdminData()" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
+                    🔄 Refresh
+                </button>
+                <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
+                    🚪 Sign Out
+                </button>
+            </div>
+        </header>
 
-    <!-- Tab 3: Inventory / Product List Management -->
-    <section id="tab-view-products" class="space-y-4 hidden">
-        <h2 class="text-lg font-bold uppercase text-zinc-200">Active Inventory Drops</h2>
-        <div class="overflow-x-auto admin-card rounded-2xl">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
-                    <tr>
-                        <th class="p-4">Image</th>
-                        <th class="p-4">Title</th>
-                        <th class="p-4">Size</th>
-                        <th class="p-4">Price</th>
-                        <th class="p-4">ID</th>
-                        <th class="p-4 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="table-products" class="divide-y divide-zinc-800">
-                    <tr><td colspan="6" class="p-4 text-center text-zinc-500">Loading product list...</td></tr>
-                </tbody>
-            </table>
+        <!-- Overview Statistics -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="admin-card p-5 rounded-2xl">
+                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Products</span>
+                <span class="text-3xl font-black text-white" id="stat-products">0</span>
+            </div>
+            <div class="admin-card p-5 rounded-2xl">
+                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">In-Stock Orders</span>
+                <span class="text-3xl font-black text-emerald-400" id="stat-local-orders">0</span>
+            </div>
+            <div class="admin-card p-5 rounded-2xl">
+                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Import Requests</span>
+                <span class="text-3xl font-black text-amber-400" id="stat-import-orders">0</span>
+            </div>
+            <div class="admin-card p-5 rounded-2xl">
+                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Orders</span>
+                <span class="text-3xl font-black text-red-500" id="stat-total-orders">0</span>
+            </div>
+        </section>
+
+        <!-- Add New Product Form Section -->
+        <section class="admin-card p-6 rounded-3xl space-y-4">
+            <h2 class="text-xl font-black uppercase text-white flex items-center gap-2">
+                <span>➕</span> Add New Local Drop
+            </h2>
+            <form id="add-product-form" onsubmit="handleAddProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="sm:col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Title / Name *</label>
+                    <input type="text" id="p-title" required placeholder="e.g. Y2K Oversized Graphic Hoodie" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Price (DZD) *</label>
+                    <input type="number" id="p-price" required placeholder="4500" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Size *</label>
+                    <select id="p-size" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL" selected>XL</option>
+                        <option value="XXL">XXL</option>
+                        <option value="Oversized Fit">Oversized Fit</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2 md:col-span-2">
+                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Image URL *</label>
+                    <input type="url" id="p-image" required placeholder="https://..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Category / Tag</label>
+                    <input type="text" id="p-category" placeholder="e.g. Hoodies, T-Shirts" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div class="sm:col-span-2 md:col-span-3">
+                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Description</label>
+                    <textarea id="p-desc" rows="2" placeholder="Item condition, fit specifications, material..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"></textarea>
+                </div>
+                <div class="sm:col-span-2 md:col-span-3">
+                    <button type="submit" id="add-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3 rounded-xl transition">
+                        Upload & Publish Product
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Navigation Tabs for Orders and Catalog -->
+        <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
+            <button id="tab-btn-local" onclick="switchAdminTab('local')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition">
+                📦 In-Stock Orders (<span id="tab-count-local">0</span>)
+            </button>
+            <button id="tab-btn-imports" onclick="switchAdminTab('imports')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
+                ✈️ Global Import Requests (<span id="tab-count-imports">0</span>)
+            </button>
+            <button id="tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
+                🏷️ Manage Inventory (<span id="tab-count-products">0</span>)
+            </button>
         </div>
-    </section>
+
+        <!-- Tab 1: In-Stock Orders -->
+        <section id="tab-view-local" class="space-y-4">
+            <h2 class="text-lg font-bold uppercase text-zinc-200">Local Inventory Orders</h2>
+            <div class="overflow-x-auto admin-card rounded-2xl">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                        <tr>
+                            <th class="p-4">Order ID</th>
+                            <th class="p-4">Customer Name</th>
+                            <th class="p-4">Phone</th>
+                            <th class="p-4">Location</th>
+                            <th class="p-4">Address</th>
+                            <th class="p-4">Product ID</th>
+                            <th class="p-4">Date</th>
+                            <th class="p-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-local-orders" class="divide-y divide-zinc-800">
+                        <tr><td colspan="8" class="p-4 text-center text-zinc-500">Loading local orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tab 2: Global Import Requests -->
+        <section id="tab-view-imports" class="space-y-4 hidden">
+            <h2 class="text-lg font-bold uppercase text-zinc-200">AliExpress / Shein / Temu Custom Import Orders</h2>
+            <div class="overflow-x-auto admin-card rounded-2xl">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                        <tr>
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Customer Name</th>
+                            <th class="p-4">Phone</th>
+                            <th class="p-4">Location & Address</th>
+                            <th class="p-4">Calculated Price / Details</th>
+                            <th class="p-4">Product Link</th>
+                            <th class="p-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-import-orders" class="divide-y divide-zinc-800">
+                        <tr><td colspan="7" class="p-4 text-center text-zinc-500">Loading import requests...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tab 3: Inventory / Product List Management -->
+        <section id="tab-view-products" class="space-y-4 hidden">
+            <h2 class="text-lg font-bold uppercase text-zinc-200">Active Inventory Drops</h2>
+            <div class="overflow-x-auto admin-card rounded-2xl">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                        <tr>
+                            <th class="p-4">Image</th>
+                            <th class="p-4">Title</th>
+                            <th class="p-4">Size</th>
+                            <th class="p-4">Price</th>
+                            <th class="p-4">ID</th>
+                            <th class="p-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-products" class="divide-y divide-zinc-800">
+                        <tr><td colspan="6" class="p-4 text-center text-zinc-500">Loading product list...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
 
     <script>
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // Owner Login Credentials
+        const OWNER_CREDENTIALS = {
+            email: "aminegambull@gmail.com",
+            password: "Mimimimoo7",
+            name: "amine"
+        };
+
         let localOrdersList = [];
         let importOrdersList = [];
         let productsList = [];
+
+        function checkAuth() {
+            const session = localStorage.getItem("admin_session");
+            const loginScreen = document.getElementById("login-screen");
+            const adminDashboard = document.getElementById("admin-dashboard");
+
+            if (session === "authenticated_amine") {
+                loginScreen.classList.add("hidden");
+                adminDashboard.classList.remove("hidden");
+                document.body.className = "p-4 md:p-8 max-w-7xl mx-auto space-y-8 min-h-screen";
+                fetchAdminData();
+            } else {
+                loginScreen.classList.remove("hidden");
+                adminDashboard.classList.add("hidden");
+                document.body.className = "min-h-screen flex flex-col justify-center items-center p-4 md:p-8";
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById("login-email").value.trim();
+            const passwordInput = document.getElementById("login-password").value;
+            const errorMsg = document.getElementById("login-error");
+
+            if (emailInput.toLowerCase() === OWNER_CREDENTIALS.email.toLowerCase() && passwordInput === OWNER_CREDENTIALS.password) {
+                localStorage.setItem("admin_session", "authenticated_amine");
+                errorMsg.classList.add("hidden");
+                checkAuth();
+            } else {
+                errorMsg.classList.remove("hidden");
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem("admin_session");
+            checkAuth();
+        }
 
         function switchAdminTab(tab) {
             const btnLocal = document.getElementById('tab-btn-local');
@@ -364,7 +451,8 @@
             else fetchProducts();
         }
 
-        fetchAdminData();
+        // Initialize Authentication Check
+        checkAuth();
     </script>
 </body>
 </html>
