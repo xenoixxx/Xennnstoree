@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XENNNSTOREE | Streetwear & Imports</title>
+    <title>XENNNSTOREE | Streetwear & Drops</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -42,102 +42,150 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body class="min-h-screen flex flex-col justify-between relative">
 
     <!-- Header Navigation -->
-    <header class="bg-white/80 backdrop-blur-md border-b border-red-200 px-6 py-4 sticky top-0 z-40 flex justify-between items-center">
+    <header class="bg-white/90 backdrop-blur-md border-b border-red-200 px-6 py-4 sticky top-0 z-40 flex justify-between items-center">
         <a href="index.html" class="flex items-center gap-2">
             <span class="text-2xl font-black tracking-tight text-zinc-950">XENNN<span class="text-red-600">STOREE</span></span>
-            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded uppercase border border-red-300">DZ Edition</span>
+            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded uppercase border border-red-300">DZ</span>
         </a>
-        <div class="flex items-center gap-4">
-            <a href="#import-section" class="text-xs font-bold text-zinc-600 hover:text-red-600 uppercase transition">Custom Import Agent</a>
-            <a href="cart.html" class="relative bg-red-50 border border-red-300 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition">
-                🛒 Basket (<span id="cart-count">0</span>)
+
+        <!-- Header Controls -->
+        <div class="flex items-center gap-3">
+            <a href="cart.html" class="bg-red-50 border border-red-300 text-red-600 hover:bg-red-100 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition">
+                🛒 (<span id="cart-count">0</span>)
             </a>
+
+            <!-- Hamburger Three Stripes Button -->
+            <button onclick="toggleMenu()" class="p-2 text-zinc-950 hover:text-red-600 focus:outline-none rounded-lg border border-red-200 bg-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
         </div>
     </header>
 
+    <!-- Slide-Out Navigation Menu -->
+    <div id="nav-drawer" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity" onclick="toggleMenu()">
+        <div class="fixed top-0 right-0 w-80 h-full bg-white p-6 shadow-2xl space-y-6 border-l border-red-200" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-red-100 pb-4">
+                <span class="font-black text-lg uppercase text-zinc-950">Navigation</span>
+                <button onclick="toggleMenu()" class="text-zinc-500 font-black text-xl hover:text-red-600">&times;</button>
+            </div>
+
+            <nav class="space-y-4">
+                <a href="#catalog-section" onclick="toggleMenu()" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2">
+                    🛍️ In-Stock Catalog
+                </a>
+                <button onclick="toggleMenu(); openImportModal();" class="w-full text-left font-bold text-red-600 hover:text-red-700 uppercase text-sm py-2 flex items-center justify-between">
+                    <span>📦 AliExpress / Shein / Temu Import</span>
+                    <span class="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded font-black">Agent</span>
+                </button>
+                <a href="cart.html" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2">
+                    🛒 My Basket (<span class="menu-cart-count">0</span>)
+                </a>
+            </nav>
+        </div>
+    </div>
+
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-16">
+    <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
 
         <!-- Hero Section -->
         <section class="y2k-card p-8 rounded-3xl text-center space-y-4">
             <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tight text-zinc-950">
-                Exclusive Drops & <span class="text-red-600">Global Imports</span>
+                Exclusive Streetwear <span class="text-red-600">& Local Drops</span>
             </h1>
             <p class="text-zinc-600 text-sm md:text-base max-w-2xl mx-auto">
-                Browse localized drops or request direct orders from AliExpress, Shein, and Temu with home delivery across all 58 Wilayas.
+                Explore in-stock localized drops or tap the menu (☰) to order directly from AliExpress, Shein, and Temu with 58 Wilaya delivery.
             </p>
         </section>
 
         <!-- Product Catalog Drop Section -->
-        <section>
+        <section id="catalog-section">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black uppercase text-zinc-950">In-Stock Drops</h2>
-                <span class="text-xs font-bold text-red-600">Click any product for full specs</span>
+                <h2 class="text-2xl font-black uppercase text-zinc-950">In-Stock Catalog</h2>
+                <span class="text-xs font-bold text-red-600">Tap product for details</span>
             </div>
             <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <div class="col-span-full text-center py-12 text-zinc-400">Loading drops...</div>
-            </div>
-        </section>
-
-        <!-- Global Agent Import Service (AliExpress / Shein / Temu) -->
-        <section id="import-section" class="y2k-card p-8 rounded-3xl border-2 border-red-300">
-            <div class="max-w-3xl mx-auto space-y-6">
-                <div class="text-center space-y-2">
-                    <span class="bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase border border-red-300">Agent Order Service</span>
-                    <h2 class="text-3xl font-black uppercase text-zinc-950">Order From AliExpress, Shein, or Temu</h2>
-                    <p class="text-xs text-zinc-600">Paste the URL of any product you want from global stores and we will handle payment and door-to-door delivery in Algeria.</p>
-                </div>
-
-                <form id="import-order-form" onsubmit="handleImportOrder(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Product Link (URL) *</label>
-                        <input type="url" id="import-url" required placeholder="https://www.aliexpress.com/item/... or Shein/Temu link" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Full Name *</label>
-                        <input type="text" id="import-name" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Phone Number *</label>
-                        <input type="tel" id="import-phone" required placeholder="05XX XX XX XX" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Wilaya *</label>
-                        <select id="import-wilaya" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                            <option value="">Select Wilaya</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Commune *</label>
-                        <input type="text" id="import-commune" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Street Address *</label>
-                        <input type="text" id="import-address" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                    </div>
-
-                    <div class="md:col-span-2 bg-red-50 border border-red-200 rounded-xl p-4 flex justify-between items-center text-sm">
-                        <span class="font-bold text-zinc-700 uppercase text-xs">Shipping Fee:</span>
-                        <span class="font-bold text-red-600 text-xs">Calculated upon confirmation</span>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <button type="submit" id="import-submit-btn" class="w-full y2k-btn py-4 rounded-xl text-white font-black uppercase tracking-wider text-sm">
-                            Submit Import Request
-                        </button>
-                    </div>
-                </form>
+                <div class="col-span-full text-center py-12 text-zinc-400">Loading catalog...</div>
             </div>
         </section>
     </main>
+
+    <!-- Modal Popup Window: AliExpress / Shein / Temu Ordering -->
+    <div id="import-modal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImportModal()">
+        <div class="y2k-card w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 space-y-6 overflow-y-auto max-h-[90vh] border-2 border-red-300" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-red-100 pb-3">
+                <div>
+                    <span class="bg-red-100 text-red-600 text-[10px] font-black px-2.5 py-0.5 rounded uppercase">Agent Import Service</span>
+                    <h2 class="text-2xl font-black uppercase text-zinc-950 mt-1">Order Global Products</h2>
+                </div>
+                <button onclick="closeImportModal()" class="text-zinc-400 font-black text-2xl hover:text-red-600">&times;</button>
+            </div>
+
+            <p class="text-xs text-zinc-600">Paste your product URL from AliExpress, Shein, or Temu and we will manage the currency payment and door-to-door delivery in Algeria.</p>
+
+            <form id="import-order-form" onsubmit="handleImportOrder(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Product Link (URL) *</label>
+                    <input type="url" id="import-url" required placeholder="https://www.aliexpress.com/item/... or Shein/Temu link" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Full Name *</label>
+                    <input type="text" id="import-name" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Phone Number *</label>
+                    <input type="tel" id="import-phone" required placeholder="05XX XX XX XX" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Wilaya *</label>
+                    <select id="import-wilaya" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                        <option value="">Select Wilaya</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Commune *</label>
+                    <input type="text" id="import-commune" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Street Address *</label>
+                    <input type="text" id="import-address" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                </div>
+
+                <div class="md:col-span-2 bg-red-50 border border-red-200 rounded-xl p-3 flex justify-between items-center text-xs">
+                    <span class="font-bold text-zinc-700 uppercase">Shipping Fee:</span>
+                    <span class="font-bold text-red-600">Calculated upon confirmation call</span>
+                </div>
+
+                <div class="md:col-span-2">
+                    <button type="submit" id="import-submit-btn" class="w-full y2k-btn py-3.5 rounded-xl text-white font-black uppercase tracking-wider text-xs">
+                        Submit Import Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function toggleMenu() {
+            const drawer = document.getElementById('nav-drawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        function openImportModal() {
+            document.getElementById('import-modal').classList.remove('hidden');
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.add('hidden');
+        }
 
         function initWilayas() {
             const select = document.getElementById('import-wilaya');
@@ -162,6 +210,7 @@
         function updateCartBadge() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             document.getElementById('cart-count').textContent = cart.length;
+            document.querySelectorAll('.menu-cart-count').forEach(e => e.textContent = cart.length);
         }
 
         async function loadProducts() {
@@ -169,7 +218,7 @@
             const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: false });
 
             if (error || !data || data.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-500 font-bold">No active product drops.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-500 font-bold">No active drops available.</div>`;
                 return;
             }
 
@@ -187,7 +236,7 @@
                     </a>
                     <div class="p-4 pt-0">
                         <a href="product.html?id=${p.id}" class="block text-center w-full bg-zinc-950 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs uppercase transition">
-                            View Details
+                            View Product
                         </a>
                     </div>
                 </div>
@@ -198,7 +247,7 @@
             e.preventDefault();
             const btn = document.getElementById('import-submit-btn');
             btn.disabled = true;
-            btn.textContent = "Submitting...";
+            btn.textContent = "Submitting Request...";
 
             const order = {
                 product_id: null,
@@ -216,8 +265,9 @@
             if (error) {
                 alert("Failed to submit request: " + error.message);
             } else {
-                alert("Import order submitted successfully! We will contact you shortly with the full price and delivery details.");
+                alert("Import request submitted! We will contact you on phone/WhatsApp soon.");
                 document.getElementById('import-order-form').reset();
+                closeImportModal();
             }
 
             btn.disabled = false;
