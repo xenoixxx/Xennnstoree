@@ -110,8 +110,14 @@
                     </button>
                 </div>
 
-                <!-- Cart Link -->
-                <div class="border-t border-red-100 pt-4">
+                <!-- Links Section -->
+                <div class="border-t border-red-100 pt-4 space-y-1">
+                    <a href="#about-section" onclick="toggleMenu()" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition">
+                        ℹ️ About Us
+                    </a>
+                    <a href="#contact-section" onclick="toggleMenu()" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition">
+                        📞 Contact Information
+                    </a>
                     <a href="cart.html" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition">
                         🛒 View Shopping Basket (<span class="menu-cart-count">0</span>)
                     </a>
@@ -121,7 +127,7 @@
     </div>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
+    <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-16">
 
         <!-- Hero Section -->
         <section class="y2k-card p-8 rounded-3xl text-center space-y-4">
@@ -147,9 +153,48 @@
                 <div class="col-span-full text-center py-12 text-zinc-400">Loading catalog...</div>
             </div>
         </section>
+
+        <!-- About Us Section -->
+        <section id="about-section" class="y2k-card p-8 rounded-3xl space-y-4">
+            <span class="bg-red-100 text-red-600 text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider">Who We Are</span>
+            <h2 class="text-3xl font-black uppercase text-zinc-950">About XENNNSTOREE</h2>
+            <p class="text-zinc-600 text-sm leading-relaxed max-w-4xl">
+                XENNNSTOREE is an independent streetwear hub based in Algeria, created to bring underground fashion, Y2K aesthetics, and premium global apparel directly to your doorstep. Alongside our exclusive in-house local drops, we provide a full-service import solution allowing customers across all 58 Wilayas to seamlessly buy items from international platforms like AliExpress, Shein, and Temu with local DZD cash-on-delivery.
+            </p>
+        </section>
+
+        <!-- Contact Information Section -->
+        <section id="contact-section" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="y2k-card p-6 rounded-2xl space-y-2">
+                <div class="text-red-600 font-black text-2xl">📱 Direct Contact</div>
+                <h3 class="font-bold uppercase text-zinc-950">Customer Support</h3>
+                <p class="text-xs text-zinc-600">Call or message us for order confirmations and inquiries.</p>
+                <a href="tel:+213500000000" class="block font-black text-red-600 hover:underline text-sm pt-2">+213 5XX XX XX XX</a>
+            </div>
+
+            <div class="y2k-card p-6 rounded-2xl space-y-2">
+                <div class="text-red-600 font-black text-2xl">📸 Instagram</div>
+                <h3 class="font-bold uppercase text-zinc-950">Follow Our Drops</h3>
+                <p class="text-xs text-zinc-600">Check out new stock releases, fit pictures, and customer reviews.</p>
+                <a href="https://instagram.com" target="_blank" class="block font-black text-red-600 hover:underline text-sm pt-2">@xennnstoree</a>
+            </div>
+
+            <div class="y2k-card p-6 rounded-2xl space-y-2">
+                <div class="text-red-600 font-black text-2xl">🚚 Nationwide Delivery</div>
+                <h3 class="font-bold uppercase text-zinc-950">58 Wilayas</h3>
+                <p class="text-xs text-zinc-600">Home delivery or desktop stop-desk collection available across all regions.</p>
+                <span class="block font-black text-zinc-950 text-sm pt-2">Algérie Poste / Local Express</span>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Modal Popup Window: Shein / AliExpress / Temu Agent Ordering -->
+    <!-- Footer -->
+    <footer class="bg-white border-t border-red-200 mt-16 py-8 px-6 text-center text-xs text-zinc-500">
+        <p>&copy; 2026 XENNNSTOREE. All Rights Reserved. Delivered across all 58 Wilayas.</p>
+    </footer>
+
+    <!-- Modal Popup Window: Shein / AliExpress / Temu Agent Ordering with Live DZD Price Calculator -->
     <div id="import-modal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImportModal()">
         <div class="y2k-card w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 space-y-6 overflow-y-auto max-h-[90vh] border-2 border-red-300" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-red-100 pb-3">
@@ -160,13 +205,28 @@
                 <button onclick="closeImportModal()" class="text-zinc-400 font-black text-2xl hover:text-red-600">&times;</button>
             </div>
 
-            <p class="text-xs text-zinc-600">Paste your product URL from Shein, AliExpress, or Temu. We handle international payment and local delivery to all 58 Wilayas.</p>
+            <p class="text-xs text-zinc-600">Paste your product URL from Shein, AliExpress, or Temu. Enter the price in USD ($) to see the total calculated price in DZD.</p>
 
             <form id="import-order-form" onsubmit="handleImportOrder(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Product Link (URL) *</label>
-                    <input type="url" id="import-url" required placeholder="https://www.shein.com/item... or AliExpress/Temu link" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <input type="url" id="import-url" required placeholder="https://www.aliexpress.com/item... or Shein/Temu link" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
                 </div>
+
+                <!-- Price Calculator Inputs -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Price on Website ($ USD) *</label>
+                    <input type="number" step="0.01" min="1" id="import-usd-price" required placeholder="e.g. 15.50" oninput="calculateDZDPrice()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 font-bold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Estimated Total Price (DZD)</label>
+                    <div id="import-dzd-preview" class="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-black text-red-600 flex items-center justify-between">
+                        <span>0 DZD</span>
+                        <span class="text-[10px] text-zinc-400 font-normal">(Rate: 255 + 15%)</span>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Full Name *</label>
                     <input type="text" id="import-name" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
@@ -191,7 +251,7 @@
                 </div>
 
                 <div class="md:col-span-2 bg-red-50 border border-red-200 rounded-xl p-3 flex justify-between items-center text-xs">
-                    <span class="font-bold text-zinc-700 uppercase">Shipping Fee:</span>
+                    <span class="font-bold text-zinc-700 uppercase">Local Shipping Fee:</span>
                     <span class="font-bold text-red-600">Calculated upon confirmation call</span>
                 </div>
 
@@ -209,7 +269,12 @@
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // Black market USD rate + 15% profit margin multiplier
+        const USD_BLACK_MARKET_RATE = 255;
+        const PROFIT_MARGIN = 1.15; // 15% margin
+
         let allProducts = [];
+        let calculatedDZD = 0;
 
         function toggleMenu() {
             const drawer = document.getElementById('nav-drawer');
@@ -222,6 +287,18 @@
 
         function closeImportModal() {
             document.getElementById('import-modal').classList.add('hidden');
+        }
+
+        function calculateDZDPrice() {
+            const usdVal = parseFloat(document.getElementById('import-usd-price').value) || 0;
+            if (usdVal <= 0) {
+                calculatedDZD = 0;
+                document.getElementById('import-dzd-preview').innerHTML = `<span>0 DZD</span><span class="text-[10px] text-zinc-400 font-normal">(Rate: 255 + 15%)</span>`;
+                return;
+            }
+            // Dynamic formula: USD * 255 * 1.15
+            calculatedDZD = Math.round(usdVal * USD_BLACK_MARKET_RATE * PROFIT_MARGIN);
+            document.getElementById('import-dzd-preview').innerHTML = `<span class="text-base">${calculatedDZD.toLocaleString()} DZD</span><span class="text-[10px] text-zinc-500 font-bold">($${usdVal.toFixed(2)} USD)</span>`;
         }
 
         function initWilayas() {
@@ -321,6 +398,8 @@
             btn.disabled = true;
             btn.textContent = "Submitting Request...";
 
+            const usdPrice = parseFloat(document.getElementById('import-usd-price').value) || 0;
+
             const order = {
                 product_id: null,
                 customer_name: document.getElementById('import-name').value,
@@ -328,8 +407,8 @@
                 wilaya: document.getElementById('import-wilaya').value,
                 commune: document.getElementById('import-commune').value,
                 address: document.getElementById('import-address').value,
-                import_url: document.getElementById('import-url').value,
-                delivery_fee: 0
+                import_url: document.getElementById('import-url').value + ` | Price: $${usdPrice} USD (${calculatedDZD} DZD)`,
+                delivery_fee: calculatedDZD
             };
 
             const { error } = await _supabase.from('orders').insert([order]);
@@ -337,8 +416,9 @@
             if (error) {
                 alert("Failed to submit request: " + error.message);
             } else {
-                alert("Import request submitted! We will contact you on phone/WhatsApp soon.");
+                alert(`Import request submitted!\nEstimated Total: ${calculatedDZD.toLocaleString()} DZD\nWe will contact you shortly on your phone number.`);
                 document.getElementById('import-order-form').reset();
+                calculateDZDPrice();
                 closeImportModal();
             }
 
