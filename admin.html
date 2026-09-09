@@ -56,7 +56,7 @@
                     <h1 class="text-3xl font-black text-red-500 uppercase tracking-tight">XENNNSTOREE <span class="text-white">ADMIN</span></h1>
                     <span class="bg-red-950 text-red-400 border border-red-800 text-[10px] font-black px-2 py-0.5 rounded uppercase" id="owner-tag">Amine (Owner)</span>
                 </div>
-                <p class="text-xs text-zinc-400">Manage Drops, Catalog, Local Orders & Custom Imports</p>
+                <p class="text-xs text-zinc-400">Manage Drops, Catalog, Local Orders, Stock & Custom Imports</p>
             </div>
             <div class="flex items-center gap-3">
                 <a href="index.html" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
@@ -78,20 +78,20 @@
                 <span class="text-3xl font-black text-white" id="stat-products">0</span>
             </div>
             <div class="admin-card p-5 rounded-2xl">
-                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">In-Stock Orders</span>
-                <span class="text-3xl font-black text-emerald-400" id="stat-local-orders">0</span>
+                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">In-Stock Items</span>
+                <span class="text-3xl font-black text-emerald-400" id="stat-in-stock">0</span>
             </div>
             <div class="admin-card p-5 rounded-2xl">
-                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Import Requests</span>
-                <span class="text-3xl font-black text-amber-400" id="stat-import-orders">0</span>
+                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Out of Stock Items</span>
+                <span class="text-3xl font-black text-red-500" id="stat-out-stock">0</span>
             </div>
             <div class="admin-card p-5 rounded-2xl">
                 <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Orders</span>
-                <span class="text-3xl font-black text-red-500" id="stat-total-orders">0</span>
+                <span class="text-3xl font-black text-amber-400" id="stat-total-orders">0</span>
             </div>
         </section>
 
-        <!-- Add New Product Form Section (Direct Upload + Multiple Photos) -->
+        <!-- Add New Product Form Section -->
         <section class="admin-card p-6 rounded-3xl space-y-4">
             <h2 class="text-xl font-black uppercase text-white flex items-center gap-2">
                 <span>➕</span> Add New Local Drop
@@ -117,16 +117,18 @@
                     </select>
                 </div>
                 
-                <!-- Direct File Input for Multiple Images -->
                 <div class="sm:col-span-2 md:col-span-2">
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Upload Product Photos (Select One or Multiple) *</label>
+                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Upload Product Photos *</label>
                     <input type="file" id="p-images-file" accept="image/*" multiple required onchange="previewImages(event)" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2 text-sm text-zinc-300 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-red-600 file:text-white hover:file:bg-red-700 cursor-pointer">
-                    <p class="text-[10px] text-zinc-500 mt-1">Pick multiple pictures directly from your Phone or PC storage.</p>
+                    <p class="text-[10px] text-zinc-500 mt-1">Pick multiple pictures directly from your device storage.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Category / Tag</label>
-                    <input type="text" id="p-category" placeholder="e.g. Hoodies, T-Shirts" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Initial Stock Status *</label>
+                    <select id="p-instock" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                        <option value="true" selected>In Stock</option>
+                        <option value="false">Out of Stock</option>
+                    </select>
                 </div>
 
                 <!-- Preview Area -->
@@ -156,6 +158,9 @@
             <button id="tab-btn-imports" onclick="switchAdminTab('imports')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
                 ✈️ Global Import Requests (<span id="tab-count-imports">0</span>)
             </button>
+            <button id="tab-btn-stock" onclick="switchAdminTab('stock')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
+                📊 Stock Management (<span id="tab-count-stock">0</span>)
+            </button>
             <button id="tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
                 🏷️ Manage Inventory (<span id="tab-count-products">0</span>)
             </button>
@@ -173,7 +178,7 @@
                             <th class="p-4">Phone</th>
                             <th class="p-4">Location</th>
                             <th class="p-4">Address</th>
-                            <th class="p-4">Product ID</th>
+                            <th class="p-4">Item Name / Product</th>
                             <th class="p-4">Date</th>
                             <th class="p-4 text-right">Action</th>
                         </tr>
@@ -208,7 +213,28 @@
             </div>
         </section>
 
-        <!-- Tab 3: Inventory / Product List Management -->
+        <!-- Tab 3: Stock Management -->
+        <section id="tab-view-stock" class="space-y-4 hidden">
+            <h2 class="text-lg font-bold uppercase text-zinc-200">Stock Availability Control</h2>
+            <div class="overflow-x-auto admin-card rounded-2xl">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                        <tr>
+                            <th class="p-4">Product</th>
+                            <th class="p-4">Size</th>
+                            <th class="p-4">Price</th>
+                            <th class="p-4">Current Availability</th>
+                            <th class="p-4 text-right">Stock Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-stock" class="divide-y divide-zinc-800">
+                        <tr><td colspan="5" class="p-4 text-center text-zinc-500">Loading stock data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tab 4: Inventory / Product List Management -->
         <section id="tab-view-products" class="space-y-4 hidden">
             <h2 class="text-lg font-bold uppercase text-zinc-200">Active Inventory Drops</h2>
             <div class="overflow-x-auto admin-card rounded-2xl">
@@ -219,12 +245,13 @@
                             <th class="p-4">Title</th>
                             <th class="p-4">Size</th>
                             <th class="p-4">Price</th>
+                            <th class="p-4">Status</th>
                             <th class="p-4">ID</th>
                             <th class="p-4 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody id="table-products" class="divide-y divide-zinc-800">
-                        <tr><td colspan="6" class="p-4 text-center text-zinc-500">Loading product list...</td></tr>
+                        <tr><td colspan="7" class="p-4 text-center text-zinc-500">Loading product list...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -237,7 +264,6 @@
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Owner Credentials
         const OWNER_CREDENTIALS = {
             email: "aminegambull@gmail.com",
             password: "Mimimimoo7",
@@ -311,10 +337,12 @@
         function switchAdminTab(tab) {
             const btnLocal = document.getElementById('tab-btn-local');
             const btnImports = document.getElementById('tab-btn-imports');
+            const btnStock = document.getElementById('tab-btn-stock');
             const btnProducts = document.getElementById('tab-btn-products');
 
             const viewLocal = document.getElementById('tab-view-local');
             const viewImports = document.getElementById('tab-view-imports');
+            const viewStock = document.getElementById('tab-view-stock');
             const viewProducts = document.getElementById('tab-view-products');
 
             const activeClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition";
@@ -322,10 +350,12 @@
 
             btnLocal.className = tab === 'local' ? activeClass : inactiveClass;
             btnImports.className = tab === 'imports' ? activeClass : inactiveClass;
+            btnStock.className = tab === 'stock' ? activeClass : inactiveClass;
             btnProducts.className = tab === 'products' ? activeClass : inactiveClass;
 
             viewLocal.classList.toggle('hidden', tab !== 'local');
             viewImports.classList.toggle('hidden', tab !== 'imports');
+            viewStock.classList.toggle('hidden', tab !== 'stock');
             viewProducts.classList.toggle('hidden', tab !== 'products');
         }
 
@@ -334,7 +364,10 @@
         }
 
         async function fetchOrders() {
-            const { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
+            const { data, error } = await _supabase
+                .from('orders')
+                .select('*, products(id, title)')
+                .order('id', { ascending: false });
 
             if (error) {
                 console.error("Error fetching orders:", error);
@@ -344,8 +377,6 @@
             localOrdersList = data.filter(o => !o.import_url);
             importOrdersList = data.filter(o => o.import_url);
 
-            document.getElementById('stat-local-orders').textContent = localOrdersList.length;
-            document.getElementById('stat-import-orders').textContent = importOrdersList.length;
             document.getElementById('stat-total-orders').textContent = data.length;
 
             document.getElementById('tab-count-local').textContent = localOrdersList.length;
@@ -362,20 +393,25 @@
                 return;
             }
 
-            tbody.innerHTML = localOrdersList.map(o => `
+            tbody.innerHTML = localOrdersList.map(o => {
+                const itemTitle = o.products?.title || 'Unknown Product';
+                return `
                 <tr class="hover:bg-zinc-900/60 transition">
                     <td class="p-4 font-bold text-red-500">#${o.id}</td>
                     <td class="p-4 font-bold text-white">${o.customer_name}</td>
                     <td class="p-4 font-mono">${o.phone_number}</td>
                     <td class="p-4">${o.wilaya} (${o.commune})</td>
                     <td class="p-4 text-zinc-400">${o.address || '-'}</td>
-                    <td class="p-4 font-mono text-zinc-300">Item #${o.product_id}</td>
+                    <td class="p-4">
+                        <span class="font-bold text-white block">${itemTitle}</span>
+                        <span class="font-mono text-[10px] text-zinc-500">ID: #${o.product_id}</span>
+                    </td>
                     <td class="p-4 text-zinc-500">${new Date(o.created_at || Date.now()).toLocaleDateString()}</td>
                     <td class="p-4 text-right">
                         <button onclick="deleteOrder(${o.id})" class="text-xs bg-red-950 text-red-400 border border-red-800 px-2.5 py-1 rounded hover:bg-red-900 transition">Delete</button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         function renderImportOrders() {
@@ -419,18 +455,70 @@
             }
 
             productsList = data;
+            const inStockCount = productsList.filter(p => p.in_stock !== false).length;
+            const outStockCount = productsList.length - inStockCount;
+
             document.getElementById('stat-products').textContent = productsList.length;
+            document.getElementById('stat-in-stock').textContent = inStockCount;
+            document.getElementById('stat-out-stock').textContent = outStockCount;
+
+            document.getElementById('tab-count-stock').textContent = productsList.length;
             document.getElementById('tab-count-products').textContent = productsList.length;
 
-            const tbody = document.getElementById('table-products');
+            renderStockManagement();
+            renderProductsTable();
+        }
+
+        function renderStockManagement() {
+            const tbody = document.getElementById('table-stock');
             if (productsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-zinc-500 font-bold">No products in database.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-500 font-bold">No items found in catalog.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = productsList.map(p => {
                 const images = (p.image_url || '').split(',').filter(Boolean);
                 const firstImg = images[0] || 'https://via.placeholder.com/50';
+                const isStocked = p.in_stock !== false;
+
+                return `
+                    <tr class="hover:bg-zinc-900/60 transition">
+                        <td class="p-4 flex items-center gap-3">
+                            <img src="${firstImg}" class="w-10 h-10 object-cover rounded-lg border border-zinc-700">
+                            <div>
+                                <span class="font-bold text-white block">${p.title}</span>
+                                <span class="font-mono text-[10px] text-zinc-500">ID: #${p.id}</span>
+                            </div>
+                        </td>
+                        <td class="p-4"><span class="bg-zinc-800 text-zinc-300 font-bold px-2 py-0.5 rounded">${p.size}</span></td>
+                        <td class="p-4 font-bold text-white">${p.price} DZD</td>
+                        <td class="p-4">
+                            ${isStocked 
+                                ? `<span class="bg-emerald-950 text-emerald-400 border border-emerald-800 font-black text-[10px] px-2.5 py-1 rounded-lg uppercase">🟢 In Stock</span>`
+                                : `<span class="bg-red-950 text-red-400 border border-red-800 font-black text-[10px] px-2.5 py-1 rounded-lg uppercase">🔴 Out of Stock</span>`
+                            }
+                        </td>
+                        <td class="p-4 text-right">
+                            <button onclick="toggleStock(${p.id}, ${!isStocked})" class="text-xs ${isStocked ? 'bg-amber-950 text-amber-400 border border-amber-800 hover:bg-amber-900' : 'bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900'} px-3 py-1.5 rounded-xl font-bold transition">
+                                ${isStocked ? 'Mark as Out of Stock' : 'Mark as In Stock'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderProductsTable() {
+            const tbody = document.getElementById('table-products');
+            if (productsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-zinc-500 font-bold">No products in database.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = productsList.map(p => {
+                const images = (p.image_url || '').split(',').filter(Boolean);
+                const firstImg = images[0] || 'https://via.placeholder.com/50';
+                const isStocked = p.in_stock !== false;
 
                 return `
                     <tr class="hover:bg-zinc-900/60 transition">
@@ -443,6 +531,12 @@
                         <td class="p-4 font-bold text-white">${p.title}</td>
                         <td class="p-4"><span class="bg-zinc-800 text-zinc-300 font-bold px-2 py-0.5 rounded">${p.size}</span></td>
                         <td class="p-4 font-bold text-red-400">${p.price} DZD</td>
+                        <td class="p-4">
+                            ${isStocked 
+                                ? `<span class="text-emerald-400 font-bold text-xs">In Stock</span>`
+                                : `<span class="text-red-500 font-bold text-xs">Out of Stock</span>`
+                            }
+                        </td>
                         <td class="p-4 font-mono text-zinc-500">#${p.id}</td>
                         <td class="p-4 text-right">
                             <button onclick="deleteProduct(${p.id})" class="text-xs bg-red-950 text-red-400 border border-red-800 px-2.5 py-1 rounded hover:bg-red-900 transition">Remove</button>
@@ -450,6 +544,19 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        async function toggleStock(productId, status) {
+            const { error } = await _supabase
+                .from('products')
+                .update({ in_stock: status })
+                .eq('id', productId);
+
+            if (error) {
+                alert("Failed to update stock status: " + error.message);
+            } else {
+                fetchProducts();
+            }
         }
 
         async function handleAddProduct(e) {
@@ -495,8 +602,9 @@
                     title: document.getElementById('p-title').value,
                     price: parseFloat(document.getElementById('p-price').value),
                     size: document.getElementById('p-size').value,
+                    in_stock: document.getElementById('p-instock').value === 'true',
                     image_url: imageUrlString,
-                    description: document.getElementById('p-desc').value + (document.getElementById('p-category').value ? ` [Category: ${document.getElementById('p-category').value}]` : '')
+                    description: document.getElementById('p-desc').value
                 };
 
                 const { error: insertError } = await _supabase.from('products').insert([newProduct]);
@@ -504,7 +612,7 @@
                 if (insertError) {
                     alert("Failed to create product record: " + insertError.message);
                 } else {
-                    alert("Product published with " + files.length + " photos successfully!");
+                    alert("Product published successfully!");
                     document.getElementById('add-product-form').reset();
                     document.getElementById('preview-container').classList.add('hidden');
                     fetchProducts();
@@ -532,7 +640,6 @@
             else fetchProducts();
         }
 
-        // Run authentication check on load
         checkAuth();
     </script>
 </body>
