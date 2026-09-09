@@ -347,25 +347,32 @@
                 return;
             }
 
-            grid.innerHTML = products.map(p => `
-                <div class="y2k-card rounded-2xl overflow-hidden hover:shadow-xl transition flex flex-col justify-between">
-                    <a href="product.html?id=${p.id}">
-                        <div class="h-64 bg-zinc-100 overflow-hidden relative">
-                            <img src="${p.image_url || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
-                            <span class="absolute top-3 right-3 bg-red-600 text-white font-black text-xs px-2.5 py-1 rounded uppercase">${p.size}</span>
-                        </div>
-                        <div class="p-4 space-y-2">
-                            <h3 class="font-black text-zinc-950 text-base line-clamp-1">${p.title}</h3>
-                            <p class="text-red-600 font-black text-lg">${p.price} DZD</p>
-                        </div>
-                    </a>
-                    <div class="p-4 pt-0">
-                        <a href="product.html?id=${p.id}" class="block text-center w-full bg-zinc-950 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs uppercase transition">
-                            View Product
+            grid.innerHTML = products.map(p => {
+                // FIX: Extract only the first image URL from comma-separated uploaded links
+                const rawImages = p.image_url || p.image || '';
+                const imageList = rawImages.split(',').map(url => url.trim()).filter(Boolean);
+                const displayImage = imageList[0] || 'https://via.placeholder.com/300';
+
+                return `
+                    <div class="y2k-card rounded-2xl overflow-hidden hover:shadow-xl transition flex flex-col justify-between">
+                        <a href="product.html?id=${p.id}">
+                            <div class="h-64 bg-zinc-100 overflow-hidden relative">
+                                <img src="${displayImage}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
+                                <span class="absolute top-3 right-3 bg-red-600 text-white font-black text-xs px-2.5 py-1 rounded uppercase">${p.size}</span>
+                            </div>
+                            <div class="p-4 space-y-2">
+                                <h3 class="font-black text-zinc-950 text-base line-clamp-1">${p.title}</h3>
+                                <p class="text-red-600 font-black text-lg">${p.price} DZD</p>
+                            </div>
                         </a>
+                        <div class="p-4 pt-0">
+                            <a href="product.html?id=${p.id}" class="block text-center w-full bg-zinc-950 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs uppercase transition">
+                                View Product
+                            </a>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function filterCategory(category) {
