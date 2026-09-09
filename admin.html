@@ -491,7 +491,7 @@
                             </div>
                         </td>
                         <td class="p-4"><span class="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded border border-slate-200">${p.size}</span></td>
-                        <td class="p-4 font-bold text-slate-900">${p.price} DZD</td>
+                        <td class="p-4 font-bold text-slate-900">${p.price} DZD</span></td>
                         <td class="p-4">
                             ${isStocked 
                                 ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-[10px] px-2.5 py-1 rounded-lg uppercase">🟢 In Stock</span>`
@@ -620,7 +620,7 @@
 
             } catch (err) {
                 alert("Upload error: " + err.message);
-            } font-black {
+            } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<span>📤 Upload Photos & Publish Product</span>`;
             }
