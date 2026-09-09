@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,59 +24,93 @@
             background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
             transition: all 0.25s ease;
         }
+        .y2k-btn:hover {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+            filter: brightness(1.1);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-    <header class="bg-white/80 backdrop-blur-md border-b border-red-200 px-6 py-4 sticky top-0 z-40 flex justify-between items-center">
+    <!-- Header Navigation -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-red-200 px-6 py-4 sticky top-0 z-40 flex justify-between items-center">
         <a href="index.html" class="flex items-center gap-2">
             <span class="text-2xl font-black tracking-tight text-zinc-950">XENNN<span class="text-red-600">STOREE</span></span>
+            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded uppercase border border-red-300">DZ</span>
         </a>
-        <a href="index.html" class="text-xs font-bold text-zinc-600 hover:text-red-600 transition">&larr; Continue Shopping</a>
+        <a href="index.html" class="text-xs font-bold text-zinc-600 hover:text-red-600 uppercase transition">
+            ← Continue Shopping
+        </a>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 py-10 w-full flex-grow space-y-8">
-        <h1 class="text-3xl font-black uppercase text-zinc-950">Your Basket</h1>
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-10 w-full flex-grow space-y-8">
+        <h1 class="text-4xl font-black uppercase text-zinc-950">Your Basket</h1>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Items -->
-            <div class="lg:col-span-2 space-y-4" id="cart-items-container">
-                <p class="text-zinc-500">Your basket is empty.</p>
+        <div id="cart-container" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Basket Items -->
+            <div id="cart-items-list" class="lg:col-span-2 space-y-4">
+                <!-- Cart items load here -->
             </div>
 
-            <!-- Summary -->
-            <div class="y2k-card p-6 rounded-3xl h-fit space-y-6 border border-red-200">
-                <h2 class="text-xl font-black uppercase text-zinc-950">Order Summary</h2>
+            <!-- Order Summary Sidebar -->
+            <div class="y2k-card p-6 rounded-3xl space-y-6 h-fit border-2 border-red-300">
+                <h2 class="text-xl font-black uppercase text-zinc-950 border-b border-red-100 pb-3">Order Summary</h2>
 
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between text-zinc-600">
                         <span>Items Subtotal:</span>
-                        <span id="subtotal-price" class="font-bold text-zinc-950">0 DZD</span>
+                        <span id="summary-subtotal" class="font-bold text-zinc-950">0 DZD</span>
                     </div>
                     <div class="flex justify-between text-zinc-600">
                         <span>Delivery Fee:</span>
-                        <span class="font-bold text-red-600 text-xs">Calculated on call</span>
+                        <span id="summary-delivery-fee" class="font-bold text-red-600">Select Wilaya</span>
                     </div>
-                    <div class="flex justify-between text-lg font-black border-t border-red-100 pt-3 text-zinc-950">
-                        <span>Items Total:</span>
-                        <span id="grand-total-price" class="text-red-600">0 DZD</span>
+                    <div class="flex justify-between text-lg font-black text-red-600 border-t border-red-200 pt-3">
+                        <span>Grand Total:</span>
+                        <span id="summary-grand-total">0 DZD</span>
                     </div>
                 </div>
 
-                <!-- Form -->
-                <form id="checkout-form" onsubmit="handleCheckout(event)" class="space-y-3 pt-2">
-                    <input type="text" id="cust-name" required placeholder="Full Name" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
-                    <input type="tel" id="cust-phone" required placeholder="Phone Number" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
-                    
-                    <select id="cust-wilaya" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
-                        <option value="">Select Wilaya</option>
-                    </select>
+                <!-- Checkout Form -->
+                <form id="checkout-form" onsubmit="handleCheckout(event)" class="space-y-4 pt-2">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Full Name *</label>
+                        <input type="text" id="cust-name" required placeholder="e.g. Amine Batata" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    </div>
 
-                    <input type="text" id="cust-commune" required placeholder="Commune" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
-                    <input type="text" id="cust-address" required placeholder="Street Address" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Phone Number *</label>
+                        <input type="tel" id="cust-phone" required placeholder="05XX XX XX XX" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    </div>
 
-                    <button type="submit" id="checkout-btn" class="w-full y2k-btn py-3.5 rounded-xl text-white font-black uppercase text-xs tracking-wider">
-                        Confirm Purchase
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Wilaya *</label>
+                        <select id="cust-wilaya" required onchange="calculateCartTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                            <option value="">Select Wilaya</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Delivery Type *</label>
+                        <select id="cust-delivery-type" required onchange="calculateCartTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                            <option value="home">Home Delivery (À domicile)</option>
+                            <option value="desk">Stop Desk / Agency</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Commune *</label>
+                        <input type="text" id="cust-commune" required placeholder="e.g. Mahelma" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Street Address *</label>
+                        <input type="text" id="cust-address" required placeholder="e.g. AADL 1256 Mahelma" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="w-full y2k-btn py-3.5 rounded-xl text-white font-black uppercase tracking-wider text-xs shadow-md">
+                        Confirm Order
                     </button>
                 </form>
             </div>
@@ -88,106 +122,195 @@
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        function initWilayas() {
+        // 58 Wilaya Delivery Rates (Home / Desk)
+        const WILAYA_RATES = {
+            "01": { name: "Adrar", home: 1400, desk: 750 },
+            "02": { name: "Chlef", home: 600, desk: 400 },
+            "03": { name: "Laghouat", home: 800, desk: 500 },
+            "04": { name: "Oum El Bouaghi", home: 600, desk: 400 },
+            "05": { name: "Batna", home: 600, desk: 400 },
+            "06": { name: "Béjaïa", home: 600, desk: 400 },
+            "07": { name: "Biskra", home: 800, desk: 500 },
+            "08": { name: "Béchar", home: 1200, desk: 650 },
+            "09": { name: "Blida", home: 500, desk: 400 },
+            "10": { name: "Bouira", home: 600, desk: 400 },
+            "11": { name: "Tamanrasset", home: 1700, desk: 1050 },
+            "12": { name: "Tébessa", home: 600, desk: 400 },
+            "13": { name: "Tlemcen", home: 600, desk: 400 },
+            "14": { name: "Tiaret", home: 600, desk: 400 },
+            "15": { name: "Tizi Ouzou", home: 600, desk: 400 },
+            "16": { name: "Alger", home: 400, desk: 200 },
+            "17": { name: "Djelfa", home: 800, desk: 500 },
+            "18": { name: "Jijel", home: 600, desk: 400 },
+            "19": { name: "Sétif", home: 600, desk: 400 },
+            "20": { name: "Saïda", home: 600, desk: 400 },
+            "21": { name: "Skikda", home: 600, desk: 400 },
+            "22": { name: "Sidi Bel Abbès", home: 600, desk: 400 },
+            "23": { name: "Annaba", home: 600, desk: 400 },
+            "24": { name: "Guelma", home: 600, desk: 400 },
+            "25": { name: "Constantine", home: 600, desk: 400 },
+            "26": { name: "Médéa", home: 600, desk: 400 },
+            "27": { name: "Mostaganem", home: 600, desk: 400 },
+            "28": { name: "M'Sila", home: 600, desk: 400 },
+            "29": { name: "Mascara", home: 600, desk: 400 },
+            "30": { name: "Ouargla", home: 900, desk: 650 },
+            "31": { name: "Oran", home: 600, desk: 400 },
+            "32": { name: "El Bayadh", home: 900, desk: 650 },
+            "33": { name: "Illizi", home: 1700, desk: 1050 },
+            "34": { name: "Bordj Bou Arreridj", home: 600, desk: 400 },
+            "35": { name: "Boumerdès", home: 500, desk: 400 },
+            "36": { name: "El Tarf", home: 600, desk: 400 },
+            "37": { name: "Tindouf", home: 1300, desk: 750 },
+            "38": { name: "Tissemsilt", home: 600, desk: 400 },
+            "39": { name: "El Oued", home: 900, desk: 650 },
+            "40": { name: "Khenchela", home: 600, desk: 400 },
+            "41": { name: "Souk Ahras", home: 600, desk: 400 },
+            "42": { name: "Tipaza", home: 500, desk: 400 },
+            "43": { name: "Mila", home: 600, desk: 400 },
+            "44": { name: "Aïn Defla", home: 600, desk: 400 },
+            "45": { name: "Naâma", home: 900, desk: 650 },
+            "46": { name: "Aïn Témouchent", home: 600, desk: 400 },
+            "47": { name: "Ghardaïa", home: 900, desk: 650 },
+            "48": { name: "Relizane", home: 600, desk: 400 },
+            "49": { name: "Timimoun", home: 1300, desk: 750 },
+            "50": { name: "El Meniaa", home: 1100, desk: 650 },
+            "51": { name: "Ouled Djellal", home: 800, desk: 650 },
+            "52": { name: "Beni Abbes", home: 1300, desk: 1200 },
+            "53": { name: "In Salah", home: 1300, desk: 1050 },
+            "54": { name: "Touggourt", home: 900, desk: 650 },
+            "55": { name: "El M'Ghair", home: 900, desk: 900 },
+            "56": { name: "Djanet", home: 1700, desk: 1050 },
+            "57": { name: "In Guezzam", home: 1700, desk: 1050 },
+            "58": { name: "Bordj Baji Mokhtar", home: 1700, desk: 1050 }
+        };
+
+        let currentCart = [];
+        let itemsSubtotal = 0;
+        let activeDeliveryFee = 0;
+
+        function initWilayaSelect() {
             const select = document.getElementById('cust-wilaya');
-            const wilayas = [
-                "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna", 
-                "06 - Béjaïa", "07 - Biskra", "08 - Béchar", "09 - Blida", "10 - Bouira", 
-                "11 - Tamanrasset", "12 - Tébessa", "13 - Tlemcen", "14 - Tiaret", "15 - Tizi Ouzou", 
-                "16 - Algiers", "17 - Djelfa", "18 - Jijel", "19 - Sétif", "20 - Saïda", 
-                "21 - Skikda", "22 - Sidi Bel Abbès", "23 - Annaba", "24 - Guelma", "25 - Constantine", 
-                "26 - Médéa", "27 - Mostaganem", "28 - M'Sila", "29 - Mascara", "30 - Ouargla", 
-                "31 - Oran", "32 - El Bayadh", "33 - Illizi", "34 - Bordj Bou Arréridj", "35 - Boumerdès", 
-                "36 - El Tarf", "37 - Tindouf", "38 - Tissemsilt", "39 - El Oued", "40 - Khenchela", 
-                "41 - Souk Ahras", "42 - Tipaza", "43 - Mila", "44 - Aïn Defla", "45 - Naâma", 
-                "46 - Aïn Témouchent", "47 - Ghardaïa", "48 - Relizane", "49 - El M'Ghair", "50 - El Meniaa", 
-                "51 - Ouled Djellal", "52 - Bordj Baji Mokhtar", "53 - Béni Abbès", "54 - Timimoun", 
-                "55 - Touggourt", "56 - Djanet", "57 - In Salah", "58 - In Guezzam"
-            ];
             select.innerHTML = `<option value="">Select Wilaya</option>` + 
-                wilayas.map(w => `<option value="${w}">${w}</option>`).join('');
+                Object.keys(WILAYA_RATES).map(code => {
+                    const item = WILAYA_RATES[code];
+                    return `<option value="${code}">${code} - ${item.name}</option>`;
+                }).join('');
         }
 
         function renderCart() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const container = document.getElementById('cart-items-container');
+            currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const listEl = document.getElementById('cart-items-list');
 
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="y2k-card p-8 rounded-2xl text-center text-zinc-500 font-bold">Your basket is currently empty.</div>`;
+            if (currentCart.length === 0) {
+                listEl.innerHTML = `
+                    <div class="y2k-card p-8 rounded-3xl text-center space-y-3">
+                        <div class="text-4xl">🛒</div>
+                        <h3 class="text-lg font-black uppercase text-zinc-950">Your basket is empty</h3>
+                        <a href="index.html" class="inline-block bg-zinc-950 text-white text-xs font-bold px-4 py-2 rounded-xl uppercase">Explore Collection</a>
+                    </div>
+                `;
+                itemsSubtotal = 0;
                 calculateCartTotals();
                 return;
             }
 
-            container.innerHTML = cart.map((item, idx) => `
-                <div class="y2k-card p-4 rounded-2xl flex items-center justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <img src="${item.image_url || 'https://via.placeholder.com/100'}" class="w-16 h-16 object-cover rounded-xl bg-zinc-100">
-                        <div>
-                            <h3 class="font-bold text-zinc-950 text-sm">${item.title}</h3>
-                            <p class="text-xs text-zinc-500">Size: ${item.size}</p>
-                            <p class="text-red-600 font-black text-sm">${item.price} DZD</p>
+            itemsSubtotal = 0;
+            listEl.innerHTML = currentCart.map((item, index) => {
+                const itemPrice = parseFloat(item.price) || 0;
+                itemsSubtotal += itemPrice;
+
+                const displayImg = (item.image_url || item.image || '').split(',')[0] || 'https://via.placeholder.com/150';
+
+                return `
+                    <div class="y2k-card p-4 rounded-2xl flex items-center gap-4 border border-red-200">
+                        <img src="${displayImg}" class="w-20 h-20 object-cover rounded-xl border border-red-100">
+                        <div class="flex-grow">
+                            <h3 class="font-black text-zinc-950 uppercase text-sm">${item.title}</h3>
+                            <p class="text-xs text-zinc-500">Size: <span class="font-bold text-zinc-800">${item.size || 'Standard'}</span></p>
+                            <p class="text-red-600 font-black text-sm mt-1">${itemPrice.toLocaleString()} DZD</p>
                         </div>
+                        <button onclick="removeItem(${index})" class="text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg transition">
+                            Remove
+                        </button>
                     </div>
-                    <button onclick="removeFromCart(${idx})" class="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200">Remove</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             calculateCartTotals();
         }
 
-        function removeFromCart(index) {
-            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            cart.splice(index, 1);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            renderCart();
+        function calculateCartTotals() {
+            const wilayaCode = document.getElementById('cust-wilaya').value;
+            const deliveryType = document.getElementById('cust-delivery-type').value;
+
+            if (wilayaCode && WILAYA_RATES[wilayaCode]) {
+                activeDeliveryFee = WILAYA_RATES[wilayaCode][deliveryType] || 0;
+                document.getElementById('summary-delivery-fee').textContent = `${activeDeliveryFee.toLocaleString()} DZD`;
+            } else {
+                activeDeliveryFee = 0;
+                document.getElementById('summary-delivery-fee').textContent = "Select Wilaya";
+            }
+
+            const grandTotal = itemsSubtotal + activeDeliveryFee;
+
+            document.getElementById('summary-subtotal').textContent = `${itemsSubtotal.toLocaleString()} DZD`;
+            document.getElementById('summary-grand-total').textContent = `${grandTotal.toLocaleString()} DZD`;
         }
 
-        function calculateCartTotals() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-
-            document.getElementById('subtotal-price').textContent = `${subtotal.toLocaleString()} DZD`;
-            document.getElementById('grand-total-price').textContent = `${subtotal.toLocaleString()} DZD`;
+        function removeItem(index) {
+            currentCart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(currentCart));
+            renderCart();
         }
 
         async function handleCheckout(e) {
             e.preventDefault();
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-            if (cart.length === 0) {
-                alert("Your basket is empty!");
+            if (currentCart.length === 0) {
+                alert("Your basket is empty.");
                 return;
             }
 
-            const btn = document.getElementById('checkout-btn');
+            const btn = document.getElementById('submit-btn');
             btn.disabled = true;
-            btn.textContent = "Processing Order...";
+            btn.textContent = "PROCESSING ORDER...";
 
-            const ordersToInsert = cart.map(item => ({
-                product_id: item.id,
-                customer_name: document.getElementById('cust-name').value,
-                phone_number: document.getElementById('cust-phone').value,
-                wilaya: document.getElementById('cust-wilaya').value,
-                commune: document.getElementById('cust-commune').value,
-                address: document.getElementById('cust-address').value,
-                delivery_fee: 0
-            }));
+            const wilayaCode = document.getElementById('cust-wilaya').value;
+            const wilayaInfo = WILAYA_RATES[wilayaCode];
+            const wilayaName = wilayaInfo ? `${wilayaCode} - ${wilayaInfo.name}` : wilayaCode;
+            const deliveryType = document.getElementById('cust-delivery-type').value;
+            const userAddress = document.getElementById('cust-address').value;
+            
+            const grandTotal = itemsSubtotal + activeDeliveryFee;
+            
+            // Embed delivery fee into the address string so it avoids missing schema columns error
+            const fullAddressInfo = `${userAddress} (${deliveryType === 'home' ? 'Home' : 'Stop Desk'} | Delivery: ${activeDeliveryFee} DZD | Grand Total: ${grandTotal} DZD)`;
 
-            const { error } = await _supabase.from('orders').insert(ordersToInsert);
+            try {
+                for (const item of currentCart) {
+                    const { error } = await _supabase.from('orders').insert([{
+                        product_id: item.id || null,
+                        customer_name: document.getElementById('cust-name').value,
+                        phone_number: document.getElementById('cust-phone').value,
+                        wilaya: wilayaName,
+                        commune: document.getElementById('cust-commune').value,
+                        address: fullAddressInfo
+                    }]);
 
-            if (error) {
-                alert("Error placing order: " + error.message);
-            } else {
-                alert("Order placed successfully! We will contact you soon to confirm order details.");
+                    if (error) throw error;
+                }
+
+                alert(`Order placed successfully!\nSubtotal: ${itemsSubtotal.toLocaleString()} DZD\nDelivery: ${activeDeliveryFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD`);
                 localStorage.removeItem('cart');
                 window.location.href = "index.html";
+            } catch (err) {
+                alert("Error placing order: " + err.message);
+                btn.disabled = false;
+                btn.textContent = "Confirm Order";
             }
-
-            btn.disabled = false;
-            btn.textContent = "Confirm Purchase";
         }
 
-        initWilayas();
+        initWilayaSelect();
         renderCart();
     </script>
 </body>
