@@ -194,7 +194,7 @@
         <p>&copy; 2026 XENNNSTOREE. All Rights Reserved. Delivered across all 58 Wilayas.</p>
     </footer>
 
-    <!-- Modal Popup Window: Shein / AliExpress / Temu Agent Ordering with Live DZD Price Calculator -->
+    <!-- Modal Popup Window: Shein / AliExpress / Temu Agent Ordering with Dynamic Wilaya Delivery Rates -->
     <div id="import-modal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImportModal()">
         <div class="y2k-card w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 space-y-6 overflow-y-auto max-h-[90vh] border-2 border-red-300" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-red-100 pb-3">
@@ -205,7 +205,7 @@
                 <button onclick="closeImportModal()" class="text-zinc-400 font-black text-2xl hover:text-red-600">&times;</button>
             </div>
 
-            <p class="text-xs text-zinc-600">Paste your product URL from Shein, AliExpress, or Temu. Enter the price in USD ($) to see the total calculated price in DZD.</p>
+            <p class="text-xs text-zinc-600">Paste your product URL from Shein, AliExpress, or Temu. Enter the price in USD ($) to see the calculated item price and delivery rates.</p>
 
             <form id="import-order-form" onsubmit="handleImportOrder(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2">
@@ -216,11 +216,11 @@
                 <!-- Price Calculator Inputs -->
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Price on Website ($ USD) *</label>
-                    <input type="number" step="0.01" min="1" id="import-usd-price" required placeholder="e.g. 15.50" oninput="calculateDZDPrice()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 font-bold">
+                    <input type="number" step="0.01" min="1" id="import-usd-price" required placeholder="e.g. 15.50" oninput="calculateTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 font-bold">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Estimated Total Price (DZD)</label>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Estimated Item Price (DZD)</label>
                     <div id="import-dzd-preview" class="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-black text-red-600 flex items-center justify-between">
                         <span>0 DZD</span>
                         <span class="text-[10px] text-zinc-400 font-normal">(Rate: 255 + 15%)</span>
@@ -235,24 +235,47 @@
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Phone Number *</label>
                     <input type="tel" id="import-phone" required placeholder="05XX XX XX XX" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
                 </div>
+
+                <!-- Wilaya & Delivery Method Selection -->
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Wilaya *</label>
-                    <select id="import-wilaya" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <select id="import-wilaya" required onchange="updateDeliveryOptions()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
                         <option value="">Select Wilaya</option>
                     </select>
                 </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Delivery Type *</label>
+                    <select id="import-delivery-type" required onchange="calculateTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                        <option value="home">Home Delivery (À domicile)</option>
+                        <option value="desk">Stop Desk / Agency</option>
+                    </select>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Commune *</label>
                     <input type="text" id="import-commune" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
                 </div>
-                <div class="md:col-span-2">
+
+                <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Street Address *</label>
                     <input type="text" id="import-address" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
                 </div>
 
-                <div class="md:col-span-2 bg-red-50 border border-red-200 rounded-xl p-3 flex justify-between items-center text-xs">
-                    <span class="font-bold text-zinc-700 uppercase">Local Shipping Fee:</span>
-                    <span class="font-bold text-red-600">Calculated upon confirmation call</span>
+                <!-- Summary Box -->
+                <div class="md:col-span-2 bg-red-50 border border-red-200 rounded-xl p-4 space-y-1 text-xs">
+                    <div class="flex justify-between text-zinc-600">
+                        <span>Item Subtotal:</span>
+                        <span id="summary-item-price" class="font-bold">0 DZD</span>
+                    </div>
+                    <div class="flex justify-between text-zinc-600">
+                        <span>Delivery Fee:</span>
+                        <span id="summary-shipping-fee" class="font-bold">0 DZD</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-black text-red-600 border-t border-red-200 pt-2 mt-1">
+                        <span>Grand Total:</span>
+                        <span id="summary-grand-total">0 DZD</span>
+                    </div>
                 </div>
 
                 <div class="md:col-span-2">
@@ -269,16 +292,78 @@
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Black market USD rate + 15% profit margin multiplier
+        // USD conversion settings
         const USD_BLACK_MARKET_RATE = 255;
-        const PROFIT_MARGIN = 1.15; // 15% margin
+        const PROFIT_MARGIN = 1.15; // 15%
+
+        // 58 Wilaya Delivery Rates (Home / Stop Desk) extracted from shipping table
+        const WILAYA_RATES = {
+            "01": { name: "Adrar", home: 1400, desk: 750 },
+            "02": { name: "Chlef", home: 600, desk: 400 },
+            "03": { name: "Laghouat", home: 800, desk: 500 },
+            "04": { name: "Oum El Bouaghi", home: 600, desk: 400 },
+            "05": { name: "Batna", home: 600, desk: 400 },
+            "06": { name: "Béjaïa", home: 600, desk: 400 },
+            "07": { name: "Biskra", home: 800, desk: 500 },
+            "08": { name: "Béchar", home: 1200, desk: 650 },
+            "09": { name: "Blida", home: 500, desk: 400 },
+            "10": { name: "Bouira", home: 600, desk: 400 },
+            "11": { name: "Tamanrasset", home: 1700, desk: 1050 },
+            "12": { name: "Tébessa", home: 600, desk: 400 },
+            "13": { name: "Tlemcen", home: 600, desk: 400 },
+            "14": { name: "Tiaret", home: 600, desk: 400 },
+            "15": { name: "Tizi Ouzou", home: 600, desk: 400 },
+            "16": { name: "Alger", home: 400, desk: 200 },
+            "17": { name: "Djelfa", home: 800, desk: 500 },
+            "18": { name: "Jijel", home: 600, desk: 400 },
+            "19": { name: "Sétif", home: 600, desk: 400 },
+            "20": { name: "Saïda", home: 600, desk: 400 },
+            "21": { name: "Skikda", home: 600, desk: 400 },
+            "22": { name: "Sidi Bel Abbès", home: 600, desk: 400 },
+            "23": { name: "Annaba", home: 600, desk: 400 },
+            "24": { name: "Guelma", home: 600, desk: 400 },
+            "25": { name: "Constantine", home: 600, desk: 400 },
+            "26": { name: "Médéa", home: 600, desk: 400 },
+            "27": { name: "Mostaganem", home: 600, desk: 400 },
+            "28": { name: "M'Sila", home: 600, desk: 400 },
+            "29": { name: "Mascara", home: 600, desk: 400 },
+            "30": { name: "Ouargla", home: 900, desk: 650 },
+            "31": { name: "Oran", home: 600, desk: 400 },
+            "32": { name: "El Bayadh", home: 900, desk: 650 },
+            "33": { name: "Illizi", home: 1700, desk: 1050 },
+            "34": { name: "Bordj Bou Arreridj", home: 600, desk: 400 },
+            "35": { name: "Boumerdès", home: 500, desk: 400 },
+            "36": { name: "El Tarf", home: 600, desk: 400 },
+            "37": { name: "Tindouf", home: 1300, desk: 750 },
+            "38": { name: "Tissemsilt", home: 600, desk: 400 },
+            "39": { name: "El Oued", home: 900, desk: 650 },
+            "40": { name: "Khenchela", home: 600, desk: 400 },
+            "41": { name: "Souk Ahras", home: 600, desk: 400 },
+            "42": { name: "Tipaza", home: 500, desk: 400 },
+            "43": { name: "Mila", home: 600, desk: 400 },
+            "44": { name: "Aïn Defla", home: 600, desk: 400 },
+            "45": { name: "Naâma", home: 900, desk: 650 },
+            "46": { name: "Aïn Témouchent", home: 600, desk: 400 },
+            "47": { name: "Ghardaïa", home: 900, desk: 650 },
+            "48": { name: "Relizane", home: 600, desk: 400 },
+            "49": { name: "Timimoun", home: 1300, desk: 750 },
+            "50": { name: "El Meniaa", home: 1100, desk: 650 },
+            "51": { name: "Ouled Djellal", home: 800, desk: 650 },
+            "52": { name: "Beni Abbes", home: 1300, desk: 1200 },
+            "53": { name: "In Salah", home: 1300, desk: 1050 },
+            "54": { name: "Touggourt", home: 900, desk: 650 },
+            "55": { name: "El M'Ghair", home: 900, desk: 900 },
+            "56": { name: "Djanet", home: 1700, desk: 1050 },
+            "57": { name: "In Guezzam", home: 1700, desk: 1050 },
+            "58": { name: "Bordj Baji Mokhtar", home: 1700, desk: 1050 }
+        };
 
         let allProducts = [];
         let calculatedDZD = 0;
+        let selectedShippingFee = 0;
 
         function toggleMenu() {
-            const drawer = document.getElementById('nav-drawer');
-            drawer.classList.toggle('hidden');
+            document.getElementById('nav-drawer').classList.toggle('hidden');
         }
 
         function openImportModal() {
@@ -289,36 +374,45 @@
             document.getElementById('import-modal').classList.add('hidden');
         }
 
-        function calculateDZDPrice() {
+        function initWilayas() {
+            const select = document.getElementById('import-wilaya');
+            select.innerHTML = `<option value="">Select Wilaya</option>` + 
+                Object.keys(WILAYA_RATES).map(code => {
+                    const item = WILAYA_RATES[code];
+                    return `<option value="${code}">${code} - ${item.name}</option>`;
+                }).join('');
+        }
+
+        function updateDeliveryOptions() {
+            calculateTotals();
+        }
+
+        function calculateTotals() {
             const usdVal = parseFloat(document.getElementById('import-usd-price').value) || 0;
+            const wilayaCode = document.getElementById('import-wilaya').value;
+            const deliveryType = document.getElementById('import-delivery-type').value;
+
+            // Calculate item price
             if (usdVal <= 0) {
                 calculatedDZD = 0;
                 document.getElementById('import-dzd-preview').innerHTML = `<span>0 DZD</span><span class="text-[10px] text-zinc-400 font-normal">(Rate: 255 + 15%)</span>`;
-                return;
+            } else {
+                calculatedDZD = Math.round(usdVal * USD_BLACK_MARKET_RATE * PROFIT_MARGIN);
+                document.getElementById('import-dzd-preview').innerHTML = `<span class="text-base">${calculatedDZD.toLocaleString()} DZD</span><span class="text-[10px] text-zinc-500 font-bold">($${usdVal.toFixed(2)} USD)</span>`;
             }
-            // Dynamic formula: USD * 255 * 1.15
-            calculatedDZD = Math.round(usdVal * USD_BLACK_MARKET_RATE * PROFIT_MARGIN);
-            document.getElementById('import-dzd-preview').innerHTML = `<span class="text-base">${calculatedDZD.toLocaleString()} DZD</span><span class="text-[10px] text-zinc-500 font-bold">($${usdVal.toFixed(2)} USD)</span>`;
-        }
 
-        function initWilayas() {
-            const select = document.getElementById('import-wilaya');
-            const wilayas = [
-                "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna", 
-                "06 - Béjaïa", "07 - Biskra", "08 - Béchar", "09 - Blida", "10 - Bouira", 
-                "11 - Tamanrasset", "12 - Tébessa", "13 - Tlemcen", "14 - Tiaret", "15 - Tizi Ouzou", 
-                "16 - Algiers", "17 - Djelfa", "18 - Jijel", "19 - Sétif", "20 - Saïda", 
-                "21 - Skikda", "22 - Sidi Bel Abbès", "23 - Annaba", "24 - Guelma", "25 - Constantine", 
-                "26 - Médéa", "27 - Mostaganem", "28 - M'Sila", "29 - Mascara", "30 - Ouargla", 
-                "31 - Oran", "32 - El Bayadh", "33 - Illizi", "34 - Bordj Bou Arréridj", "35 - Boumerdès", 
-                "36 - El Tarf", "37 - Tindouf", "38 - Tissemsilt", "39 - El Oued", "40 - Khenchela", 
-                "41 - Souk Ahras", "42 - Tipaza", "43 - Mila", "44 - Aïn Defla", "45 - Naâma", 
-                "46 - Aïn Témouchent", "47 - Ghardaïa", "48 - Relizane", "49 - El M'Ghair", "50 - El Meniaa", 
-                "51 - Ouled Djellal", "52 - Bordj Baji Mokhtar", "53 - Béni Abbès", "54 - Timimoun", 
-                "55 - Touggourt", "56 - Djanet", "57 - In Salah", "58 - In Guezzam"
-            ];
-            select.innerHTML = `<option value="">Select Wilaya</option>` + 
-                wilayas.map(w => `<option value="${w}">${w}</option>`).join('');
+            // Calculate shipping fee based on Wilaya selection
+            if (wilayaCode && WILAYA_RATES[wilayaCode]) {
+                selectedShippingFee = WILAYA_RATES[wilayaCode][deliveryType] || 0;
+            } else {
+                selectedShippingFee = 0;
+            }
+
+            const grandTotal = calculatedDZD + selectedShippingFee;
+
+            document.getElementById('summary-item-price').textContent = `${calculatedDZD.toLocaleString()} DZD`;
+            document.getElementById('summary-shipping-fee').textContent = `${selectedShippingFee.toLocaleString()} DZD`;
+            document.getElementById('summary-grand-total').textContent = `${grandTotal.toLocaleString()} DZD`;
         }
 
         function updateCartBadge() {
@@ -348,7 +442,6 @@
             }
 
             grid.innerHTML = products.map(p => {
-                // FIX: Extract only the first image URL from comma-separated uploaded links
                 const rawImages = p.image_url || p.image || '';
                 const imageList = rawImages.split(',').map(url => url.trim()).filter(Boolean);
                 const displayImage = imageList[0] || 'https://via.placeholder.com/300';
@@ -406,16 +499,21 @@
             btn.textContent = "Submitting Request...";
 
             const usdPrice = parseFloat(document.getElementById('import-usd-price').value) || 0;
+            const wilayaCode = document.getElementById('import-wilaya').value;
+            const wilayaName = WILAYA_RATES[wilayaCode] ? `${wilayaCode} - ${WILAYA_RATES[wilayaCode].name}` : wilayaCode;
+            const deliveryType = document.getElementById('import-delivery-type').value;
+
+            const grandTotal = calculatedDZD + selectedShippingFee;
 
             const order = {
                 product_id: null,
                 customer_name: document.getElementById('import-name').value,
                 phone_number: document.getElementById('import-phone').value,
-                wilaya: document.getElementById('import-wilaya').value,
+                wilaya: wilayaName,
                 commune: document.getElementById('import-commune').value,
-                address: document.getElementById('import-address').value,
-                import_url: document.getElementById('import-url').value + ` | Price: $${usdPrice} USD (${calculatedDZD} DZD)`,
-                delivery_fee: calculatedDZD
+                address: `${document.getElementById('import-address').value} (${deliveryType === 'home' ? 'Home Delivery' : 'Stop Desk'})`,
+                import_url: document.getElementById('import-url').value + ` | Price: $${usdPrice} USD (${calculatedDZD} DZD) | Delivery: ${selectedShippingFee} DZD | Grand Total: ${grandTotal} DZD`,
+                delivery_fee: selectedShippingFee
             };
 
             const { error } = await _supabase.from('orders').insert([order]);
@@ -423,9 +521,9 @@
             if (error) {
                 alert("Failed to submit request: " + error.message);
             } else {
-                alert(`Import request submitted!\nEstimated Total: ${calculatedDZD.toLocaleString()} DZD\nWe will contact you shortly on your phone number.`);
+                alert(`Import request submitted!\nItem Total: ${calculatedDZD.toLocaleString()} DZD\nDelivery Fee: ${selectedShippingFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD\nWe will contact you shortly on your phone number.`);
                 document.getElementById('import-order-form').reset();
-                calculateDZDPrice();
+                calculateTotals();
                 closeImportModal();
             }
 
