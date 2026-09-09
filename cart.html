@@ -99,6 +99,11 @@
                         </select>
                     </div>
 
+                    <!-- Location Auto-detect Button -->
+                    <button type="button" id="locate-btn" onclick="detectLocation()" class="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                        <span>📍 Use Current Location (GPS / IP)</span>
+                    </button>
+
                     <div>
                         <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Commune *</label>
                         <input type="text" id="cust-commune" required placeholder="e.g. Mahelma" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
@@ -261,6 +266,64 @@
             currentCart.splice(index, 1);
             localStorage.setItem('cart', JSON.stringify(currentCart));
             renderCart();
+        }
+
+        async function detectLocation() {
+            const btn = document.getElementById('locate-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span>⏳ Detecting location...</span>`;
+
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    try {
+                        // Reverse geocoding via OpenStreetMap Nominatim
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+                        const data = await res.json();
+
+                        if (data && data.address) {
+                            const addr = data.address;
+                            const commune = addr.suburb || addr.town || addr.village || addr.city_district || addr.city || "";
+                            const road = addr.road || addr.pedestrian || addr.neighbourhood || "";
+                            
+                            if (commune) document.getElementById('cust-commune').value = commune;
+                            
+                            // Construct address string
+                            let addressParts = [road, commune].filter(Boolean);
+                            let fullStreet = addressParts.join(', ');
+                            if (fullStreet) {
+                                document.getElementById('cust-address').value = `${fullStreet} (GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)})`;
+                            } else {
+                                document.getElementById('cust-address').value = `GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                            }
+                        } else {
+                            document.getElementById('cust-address').value = `GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                        }
+                    } catch (e) {
+                        console.error("Geocoding failed:", e);
+                        document.getElementById('cust-address').value = `GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                },
+                (error) => {
+                    alert("Unable to retrieve location. Please check browser permissions or enter address manually.");
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
         }
 
         async function handleCheckout(e) {
