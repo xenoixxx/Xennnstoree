@@ -8,41 +8,41 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; background: #09090b; color: #f4f4f5; }
-        .admin-card { background: #18181b; border: 1px solid #27272a; }
+        body { font-family: 'Space Grotesk', sans-serif; background: #f8fafc; color: #0f172a; }
+        .admin-card { background: #ffffff; border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-center items-center p-4 md:p-8">
 
     <!-- Login Screen Section -->
-    <div id="login-screen" class="w-full max-w-md admin-card p-8 rounded-3xl space-y-6 shadow-2xl">
+    <div id="login-screen" class="w-full max-w-md admin-card p-8 rounded-3xl space-y-6 shadow-xl">
         <div class="text-center space-y-2">
-            <h1 class="text-3xl font-black text-red-500 uppercase tracking-tight">XENNN<span class="text-white">STOREE</span></h1>
-            <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider">Owner Portal Authentication</p>
+            <h1 class="text-3xl font-black text-red-600 uppercase tracking-tight">XENNN<span class="text-slate-900">STOREE</span></h1>
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Owner Portal Authentication</p>
         </div>
 
         <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
             <div>
-                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Email Address *</label>
-                <input type="email" id="login-email" required placeholder="owner@xennnstoree.com" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 font-bold">
+                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Email Address *</label>
+                <input type="email" id="login-email" required placeholder="owner@xennnstoree.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-red-600 font-bold">
             </div>
 
             <div>
-                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Password *</label>
-                <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 font-bold">
+                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Password *</label>
+                <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-red-600 font-bold">
             </div>
 
-            <div id="login-error" class="text-xs text-red-500 font-bold hidden text-center bg-red-950/50 border border-red-800 p-2.5 rounded-xl">
+            <div id="login-error" class="text-xs text-red-600 font-bold hidden text-center bg-red-50 border border-red-200 p-2.5 rounded-xl">
                 Invalid owner credentials. Please try again.
             </div>
 
-            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3.5 rounded-xl transition shadow-lg shadow-red-900/30">
+            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3.5 rounded-xl transition shadow-lg shadow-red-600/20">
                 Sign In to Dashboard
             </button>
         </form>
 
         <div class="text-center">
-            <a href="index.html" class="text-xs text-zinc-500 hover:text-white underline">Return to Public Storefront</a>
+            <a href="index.html" class="text-xs text-slate-400 hover:text-slate-800 underline">Return to Public Storefront</a>
         </div>
     </div>
 
@@ -50,19 +50,19 @@
     <div id="admin-dashboard" class="w-full max-w-7xl mx-auto space-y-8 hidden">
 
         <!-- Admin Header -->
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-4 gap-4">
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-4">
             <div>
                 <div class="flex items-center gap-2">
-                    <h1 class="text-3xl font-black text-red-500 uppercase tracking-tight">XENNNSTOREE <span class="text-white">ADMIN</span></h1>
-                    <span class="bg-red-950 text-red-400 border border-red-800 text-[10px] font-black px-2 py-0.5 rounded uppercase" id="owner-tag">Amine (Owner)</span>
+                    <h1 class="text-3xl font-black text-red-600 uppercase tracking-tight">XENNNSTOREE <span class="text-slate-900">ADMIN</span></h1>
+                    <span class="bg-red-50 text-red-600 border border-red-200 text-[10px] font-black px-2 py-0.5 rounded uppercase" id="owner-tag">Amine (Owner)</span>
                 </div>
-                <p class="text-xs text-zinc-400">Manage Drops, Catalog, Local Orders, Stock & Custom Imports</p>
+                <p class="text-xs text-slate-500">Manage Drops, Catalog, Local Orders, Stock & Custom Imports</p>
             </div>
             <div class="flex items-center gap-3">
-                <a href="index.html" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
+                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2 rounded-xl text-xs uppercase transition border border-slate-200">
                     🌐 Storefront
                 </a>
-                <button onclick="fetchAdminData()" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
+                <button onclick="fetchAdminData()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2 rounded-xl text-xs uppercase transition border border-slate-200">
                     🔄 Refresh
                 </button>
                 <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
@@ -73,41 +73,41 @@
 
         <!-- Overview Statistics -->
         <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="admin-card p-5 rounded-2xl">
-                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Products</span>
-                <span class="text-3xl font-black text-white" id="stat-products">0</span>
+            <div class="admin-card p-5 rounded-2xl shadow-sm">
+                <span class="text-xs font-bold uppercase text-slate-500 block mb-1">Total Products</span>
+                <span class="text-3xl font-black text-slate-900" id="stat-products">0</span>
             </div>
-            <div class="admin-card p-5 rounded-2xl">
-                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">In-Stock Items</span>
-                <span class="text-3xl font-black text-emerald-400" id="stat-in-stock">0</span>
+            <div class="admin-card p-5 rounded-2xl shadow-sm">
+                <span class="text-xs font-bold uppercase text-slate-500 block mb-1">In-Stock Items</span>
+                <span class="text-3xl font-black text-emerald-600" id="stat-in-stock">0</span>
             </div>
-            <div class="admin-card p-5 rounded-2xl">
-                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Out of Stock Items</span>
-                <span class="text-3xl font-black text-red-500" id="stat-out-stock">0</span>
+            <div class="admin-card p-5 rounded-2xl shadow-sm">
+                <span class="text-xs font-bold uppercase text-slate-500 block mb-1">Out of Stock Items</span>
+                <span class="text-3xl font-black text-red-600" id="stat-out-stock">0</span>
             </div>
-            <div class="admin-card p-5 rounded-2xl">
-                <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Orders</span>
-                <span class="text-3xl font-black text-amber-400" id="stat-total-orders">0</span>
+            <div class="admin-card p-5 rounded-2xl shadow-sm">
+                <span class="text-xs font-bold uppercase text-slate-500 block mb-1">Total Orders</span>
+                <span class="text-3xl font-black text-amber-600" id="stat-total-orders">0</span>
             </div>
         </section>
 
         <!-- Add New Product Form Section -->
-        <section class="admin-card p-6 rounded-3xl space-y-4">
-            <h2 class="text-xl font-black uppercase text-white flex items-center gap-2">
+        <section class="admin-card p-6 rounded-3xl space-y-4 shadow-sm">
+            <h2 class="text-xl font-black uppercase text-slate-900 flex items-center gap-2">
                 <span>➕</span> Add New Local Drop
             </h2>
             <form id="add-product-form" onsubmit="handleAddProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div class="sm:col-span-2 md:col-span-1">
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Title / Name *</label>
-                    <input type="text" id="p-title" required placeholder="e.g. Y2K Oversized Graphic Hoodie" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Title / Name *</label>
+                    <input type="text" id="p-title" required placeholder="e.g. Y2K Oversized Graphic Hoodie" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Price (DZD) *</label>
-                    <input type="number" id="p-price" required placeholder="4500" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Price (DZD) *</label>
+                    <input type="number" id="p-price" required placeholder="4500" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Size *</label>
-                    <select id="p-size" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Size *</label>
+                    <select id="p-size" required class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600">
                         <option value="S">S</option>
                         <option value="M">M</option>
                         <option value="L">L</option>
@@ -118,14 +118,14 @@
                 </div>
                 
                 <div class="sm:col-span-2 md:col-span-2">
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Upload Product Photos *</label>
-                    <input type="file" id="p-images-file" accept="image/*" multiple required onchange="previewImages(event)" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2 text-sm text-zinc-300 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-red-600 file:text-white hover:file:bg-red-700 cursor-pointer">
-                    <p class="text-[10px] text-zinc-500 mt-1">Pick multiple pictures directly from your device storage.</p>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Upload Product Photos *</label>
+                    <input type="file" id="p-images-file" accept="image/*" multiple required onchange="previewImages(event)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-600 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-red-600 file:text-white hover:file:bg-red-700 cursor-pointer">
+                    <p class="text-[10px] text-slate-400 mt-1">Pick multiple pictures directly from your device storage.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Initial Stock Status *</label>
-                    <select id="p-instock" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Initial Stock Status *</label>
+                    <select id="p-instock" required class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600">
                         <option value="true" selected>In Stock</option>
                         <option value="false">Out of Stock</option>
                     </select>
@@ -133,17 +133,17 @@
 
                 <!-- Preview Area -->
                 <div class="sm:col-span-2 md:col-span-3 hidden" id="preview-container">
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-2">Selected Photos Preview:</label>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Selected Photos Preview:</label>
                     <div id="image-previews" class="flex flex-wrap gap-3"></div>
                 </div>
 
                 <div class="sm:col-span-2 md:col-span-3">
-                    <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Description</label>
-                    <textarea id="p-desc" rows="2" placeholder="Item condition, fit specifications, material..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"></textarea>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Description</label>
+                    <textarea id="p-desc" rows="2" placeholder="Item condition, fit specifications, material..." class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600"></textarea>
                 </div>
 
                 <div class="sm:col-span-2 md:col-span-3">
-                    <button type="submit" id="add-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3.5 rounded-xl transition shadow-lg shadow-red-900/30 flex items-center justify-center gap-2">
+                    <button type="submit" id="add-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3.5 rounded-xl transition shadow-lg shadow-red-600/20 flex items-center justify-center gap-2">
                         <span>📤 Upload Photos & Publish Product</span>
                     </button>
                 </div>
@@ -151,27 +151,27 @@
         </section>
 
         <!-- Navigation Tabs -->
-        <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
+        <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
             <button id="tab-btn-local" onclick="switchAdminTab('local')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition">
                 📦 In-Stock Orders (<span id="tab-count-local">0</span>)
             </button>
-            <button id="tab-btn-imports" onclick="switchAdminTab('imports')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
+            <button id="tab-btn-imports" onclick="switchAdminTab('imports')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200">
                 ✈️ Global Import Requests (<span id="tab-count-imports">0</span>)
             </button>
-            <button id="tab-btn-stock" onclick="switchAdminTab('stock')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
+            <button id="tab-btn-stock" onclick="switchAdminTab('stock')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200">
                 📊 Stock Management (<span id="tab-count-stock">0</span>)
             </button>
-            <button id="tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition">
+            <button id="tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200">
                 🏷️ Manage Inventory (<span id="tab-count-products">0</span>)
             </button>
         </div>
 
         <!-- Tab 1: In-Stock Orders -->
         <section id="tab-view-local" class="space-y-4">
-            <h2 class="text-lg font-bold uppercase text-zinc-200">Local Inventory Orders</h2>
-            <div class="overflow-x-auto admin-card rounded-2xl">
+            <h2 class="text-lg font-bold uppercase text-slate-800">Local Inventory Orders</h2>
+            <div class="overflow-x-auto admin-card rounded-2xl shadow-sm">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                    <thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-200">
                         <tr>
                             <th class="p-4">Order ID</th>
                             <th class="p-4">Customer Name</th>
@@ -183,8 +183,8 @@
                             <th class="p-4 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="table-local-orders" class="divide-y divide-zinc-800">
-                        <tr><td colspan="8" class="p-4 text-center text-zinc-500">Loading local orders...</td></tr>
+                    <tbody id="table-local-orders" class="divide-y divide-slate-200">
+                        <tr><td colspan="8" class="p-4 text-center text-slate-400">Loading local orders...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -192,10 +192,10 @@
 
         <!-- Tab 2: Global Import Requests -->
         <section id="tab-view-imports" class="space-y-4 hidden">
-            <h2 class="text-lg font-bold uppercase text-zinc-200">AliExpress / Shein / Temu Custom Import Orders</h2>
-            <div class="overflow-x-auto admin-card rounded-2xl">
+            <h2 class="text-lg font-bold uppercase text-slate-800">AliExpress / Shein / Temu Custom Import Orders</h2>
+            <div class="overflow-x-auto admin-card rounded-2xl shadow-sm">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                    <thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-200">
                         <tr>
                             <th class="p-4">ID</th>
                             <th class="p-4">Customer Name</th>
@@ -206,8 +206,8 @@
                             <th class="p-4 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="table-import-orders" class="divide-y divide-zinc-800">
-                        <tr><td colspan="7" class="p-4 text-center text-zinc-500">Loading import requests...</td></tr>
+                    <tbody id="table-import-orders" class="divide-y divide-slate-200">
+                        <tr><td colspan="7" class="p-4 text-center text-slate-400">Loading import requests...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -215,10 +215,10 @@
 
         <!-- Tab 3: Stock Management -->
         <section id="tab-view-stock" class="space-y-4 hidden">
-            <h2 class="text-lg font-bold uppercase text-zinc-200">Stock Availability Control</h2>
-            <div class="overflow-x-auto admin-card rounded-2xl">
+            <h2 class="text-lg font-bold uppercase text-slate-800">Stock Availability Control</h2>
+            <div class="overflow-x-auto admin-card rounded-2xl shadow-sm">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                    <thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-200">
                         <tr>
                             <th class="p-4">Product</th>
                             <th class="p-4">Size</th>
@@ -227,8 +227,8 @@
                             <th class="p-4 text-right">Stock Action</th>
                         </tr>
                     </thead>
-                    <tbody id="table-stock" class="divide-y divide-zinc-800">
-                        <tr><td colspan="5" class="p-4 text-center text-zinc-500">Loading stock data...</td></tr>
+                    <tbody id="table-stock" class="divide-y divide-slate-200">
+                        <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading stock data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -236,10 +236,10 @@
 
         <!-- Tab 4: Inventory / Product List Management -->
         <section id="tab-view-products" class="space-y-4 hidden">
-            <h2 class="text-lg font-bold uppercase text-zinc-200">Active Inventory Drops</h2>
-            <div class="overflow-x-auto admin-card rounded-2xl">
+            <h2 class="text-lg font-bold uppercase text-slate-800">Active Inventory Drops</h2>
+            <div class="overflow-x-auto admin-card rounded-2xl shadow-sm">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-zinc-950 text-zinc-400 uppercase font-black border-b border-zinc-800">
+                    <thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-200">
                         <tr>
                             <th class="p-4">Photos</th>
                             <th class="p-4">Title</th>
@@ -250,8 +250,8 @@
                             <th class="p-4 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="table-products" class="divide-y divide-zinc-800">
-                        <tr><td colspan="7" class="p-4 text-center text-zinc-500">Loading product list...</td></tr>
+                    <tbody id="table-products" class="divide-y divide-slate-200">
+                        <tr><td colspan="7" class="p-4 text-center text-slate-400">Loading product list...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -324,7 +324,7 @@
                     reader.onload = (e) => {
                         const img = document.createElement('img');
                         img.src = e.target.result;
-                        img.className = "w-16 h-16 object-cover rounded-xl border border-zinc-700 shadow";
+                        img.className = "w-16 h-16 object-cover rounded-xl border border-slate-300 shadow-sm";
                         previews.appendChild(img);
                     };
                     reader.readAsDataURL(file);
@@ -345,8 +345,8 @@
             const viewStock = document.getElementById('tab-view-stock');
             const viewProducts = document.getElementById('tab-view-products');
 
-            const activeClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition";
-            const inactiveClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-zinc-800 text-zinc-400 hover:text-white transition";
+            const activeClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition shadow-sm";
+            const inactiveClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200";
 
             btnLocal.className = tab === 'local' ? activeClass : inactiveClass;
             btnImports.className = tab === 'imports' ? activeClass : inactiveClass;
@@ -389,26 +389,26 @@
         function renderLocalOrders() {
             const tbody = document.getElementById('table-local-orders');
             if (localOrdersList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-zinc-500 font-bold">No standard in-stock orders.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-bold">No standard in-stock orders.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = localOrdersList.map(o => {
                 const itemTitle = o.products?.title || 'Unknown Product';
                 return `
-                <tr class="hover:bg-zinc-900/60 transition">
-                    <td class="p-4 font-bold text-red-500">#${o.id}</td>
-                    <td class="p-4 font-bold text-white">${o.customer_name}</td>
-                    <td class="p-4 font-mono">${o.phone_number}</td>
-                    <td class="p-4">${o.wilaya} (${o.commune})</td>
-                    <td class="p-4 text-zinc-400">${o.address || '-'}</td>
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4 font-bold text-red-600">#${o.id}</td>
+                    <td class="p-4 font-bold text-slate-900">${o.customer_name}</td>
+                    <td class="p-4 font-mono text-slate-600">${o.phone_number}</td>
+                    <td class="p-4 text-slate-700">${o.wilaya} (${o.commune})</td>
+                    <td class="p-4 text-slate-500">${o.address || '-'}</td>
                     <td class="p-4">
-                        <span class="font-bold text-white block">${itemTitle}</span>
-                        <span class="font-mono text-[10px] text-zinc-500">ID: #${o.product_id}</span>
+                        <span class="font-bold text-slate-900 block">${itemTitle}</span>
+                        <span class="font-mono text-[10px] text-slate-400">ID: #${o.product_id}</span>
                     </td>
-                    <td class="p-4 text-zinc-500">${new Date(o.created_at || Date.now()).toLocaleDateString()}</td>
+                    <td class="p-4 text-slate-400">${new Date(o.created_at || Date.now()).toLocaleDateString()}</td>
                     <td class="p-4 text-right">
-                        <button onclick="deleteOrder(${o.id})" class="text-xs bg-red-950 text-red-400 border border-red-800 px-2.5 py-1 rounded hover:bg-red-900 transition">Delete</button>
+                        <button onclick="deleteOrder(${o.id})" class="text-xs bg-red-50 text-red-600 border border-red-200 px-2.5 py-1 rounded hover:bg-red-100 transition">Delete</button>
                     </td>
                 </tr>
             `}).join('');
@@ -417,7 +417,7 @@
         function renderImportOrders() {
             const tbody = document.getElementById('table-import-orders');
             if (importOrdersList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-zinc-500 font-bold">No custom import requests.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-bold">No custom import requests.</td></tr>`;
                 return;
             }
 
@@ -427,19 +427,19 @@
                 const priceTag = parts[1] || 'N/A';
 
                 return `
-                    <tr class="hover:bg-zinc-900/60 transition">
-                        <td class="p-4 font-bold text-red-500">#${o.id}</td>
-                        <td class="p-4 font-bold text-white">${o.customer_name}</td>
-                        <td class="p-4 font-mono">${o.phone_number}</td>
-                        <td class="p-4">${o.wilaya}, ${o.commune}<br><span class="text-zinc-500">${o.address}</span></td>
-                        <td class="p-4 font-bold text-amber-400">${priceTag}</td>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-bold text-red-600">#${o.id}</td>
+                        <td class="p-4 font-bold text-slate-900">${o.customer_name}</td>
+                        <td class="p-4 font-mono text-slate-600">${o.phone_number}</td>
+                        <td class="p-4 text-slate-700">${o.wilaya}, ${o.commune}<br><span class="text-slate-400">${o.address}</span></td>
+                        <td class="p-4 font-bold text-amber-600">${priceTag}</td>
                         <td class="p-4">
-                            <a href="${rawUrl}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-red-950 text-red-400 border border-red-800 px-3 py-1.5 rounded-lg font-bold hover:bg-red-900 transition">
+                            <a href="${rawUrl}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 transition">
                                 🔗 View Item
                             </a>
                         </td>
                         <td class="p-4 text-right">
-                            <button onclick="deleteOrder(${o.id})" class="text-xs bg-red-950 text-red-400 border border-red-800 px-2.5 py-1 rounded hover:bg-red-900 transition">Delete</button>
+                            <button onclick="deleteOrder(${o.id})" class="text-xs bg-red-50 text-red-600 border border-red-200 px-2.5 py-1 rounded hover:bg-red-100 transition">Delete</button>
                         </td>
                     </tr>
                 `;
@@ -472,7 +472,7 @@
         function renderStockManagement() {
             const tbody = document.getElementById('table-stock');
             if (productsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-500 font-bold">No items found in catalog.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 font-bold">No items found in catalog.</td></tr>`;
                 return;
             }
 
@@ -482,24 +482,24 @@
                 const isStocked = p.in_stock !== false;
 
                 return `
-                    <tr class="hover:bg-zinc-900/60 transition">
+                    <tr class="hover:bg-slate-50 transition">
                         <td class="p-4 flex items-center gap-3">
-                            <img src="${firstImg}" class="w-10 h-10 object-cover rounded-lg border border-zinc-700">
+                            <img src="${firstImg}" class="w-10 h-10 object-cover rounded-lg border border-slate-200">
                             <div>
-                                <span class="font-bold text-white block">${p.title}</span>
-                                <span class="font-mono text-[10px] text-zinc-500">ID: #${p.id}</span>
+                                <span class="font-bold text-slate-900 block">${p.title}</span>
+                                <span class="font-mono text-[10px] text-slate-400">ID: #${p.id}</span>
                             </div>
                         </td>
-                        <td class="p-4"><span class="bg-zinc-800 text-zinc-300 font-bold px-2 py-0.5 rounded">${p.size}</span></td>
-                        <td class="p-4 font-bold text-white">${p.price} DZD</td>
+                        <td class="p-4"><span class="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded border border-slate-200">${p.size}</span></td>
+                        <td class="p-4 font-bold text-slate-900">${p.price} DZD</td>
                         <td class="p-4">
                             ${isStocked 
-                                ? `<span class="bg-emerald-950 text-emerald-400 border border-emerald-800 font-black text-[10px] px-2.5 py-1 rounded-lg uppercase">🟢 In Stock</span>`
-                                : `<span class="bg-red-950 text-red-400 border border-red-800 font-black text-[10px] px-2.5 py-1 rounded-lg uppercase">🔴 Out of Stock</span>`
+                                ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-[10px] px-2.5 py-1 rounded-lg uppercase">🟢 In Stock</span>`
+                                : `<span class="bg-red-50 text-red-600 border border-red-200 font-black text-[10px] px-2.5 py-1 rounded-lg uppercase">🔴 Out of Stock</span>`
                             }
                         </td>
                         <td class="p-4 text-right">
-                            <button onclick="toggleStock(${p.id}, ${!isStocked})" class="text-xs ${isStocked ? 'bg-amber-950 text-amber-400 border border-amber-800 hover:bg-amber-900' : 'bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900'} px-3 py-1.5 rounded-xl font-bold transition">
+                            <button onclick="toggleStock(${p.id}, ${!isStocked})" class="text-xs ${isStocked ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'} px-3 py-1.5 rounded-xl font-bold transition">
                                 ${isStocked ? 'Mark as Out of Stock' : 'Mark as In Stock'}
                             </button>
                         </td>
@@ -511,7 +511,7 @@
         function renderProductsTable() {
             const tbody = document.getElementById('table-products');
             if (productsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-zinc-500 font-bold">No products in database.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-bold">No products in database.</td></tr>`;
                 return;
             }
 
@@ -521,25 +521,25 @@
                 const isStocked = p.in_stock !== false;
 
                 return `
-                    <tr class="hover:bg-zinc-900/60 transition">
+                    <tr class="hover:bg-slate-50 transition">
                         <td class="p-4">
                             <div class="flex items-center gap-1">
-                                <img src="${firstImg}" class="w-12 h-12 object-cover rounded-lg border border-zinc-700">
-                                ${images.length > 1 ? `<span class="bg-red-950 text-red-400 border border-red-800 font-black text-[10px] px-1.5 py-0.5 rounded">+${images.length - 1}</span>` : ''}
+                                <img src="${firstImg}" class="w-12 h-12 object-cover rounded-lg border border-slate-200">
+                                ${images.length > 1 ? `<span class="bg-red-50 text-red-600 border border-red-200 font-black text-[10px] px-1.5 py-0.5 rounded">+${images.length - 1}</span>` : ''}
                             </div>
                         </td>
-                        <td class="p-4 font-bold text-white">${p.title}</td>
-                        <td class="p-4"><span class="bg-zinc-800 text-zinc-300 font-bold px-2 py-0.5 rounded">${p.size}</span></td>
-                        <td class="p-4 font-bold text-red-400">${p.price} DZD</td>
+                        <td class="p-4 font-bold text-slate-900">${p.title}</td>
+                        <td class="p-4"><span class="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded border border-slate-200">${p.size}</span></td>
+                        <td class="p-4 font-bold text-red-600">${p.price} DZD</td>
                         <td class="p-4">
                             ${isStocked 
-                                ? `<span class="text-emerald-400 font-bold text-xs">In Stock</span>`
-                                : `<span class="text-red-500 font-bold text-xs">Out of Stock</span>`
+                                ? `<span class="text-emerald-600 font-bold text-xs">In Stock</span>`
+                                : `<span class="text-red-600 font-bold text-xs">Out of Stock</span>`
                             }
                         </td>
-                        <td class="p-4 font-mono text-zinc-500">#${p.id}</td>
+                        <td class="p-4 font-mono text-slate-400">#${p.id}</td>
                         <td class="p-4 text-right">
-                            <button onclick="deleteProduct(${p.id})" class="text-xs bg-red-950 text-red-400 border border-red-800 px-2.5 py-1 rounded hover:bg-red-900 transition">Remove</button>
+                            <button onclick="deleteProduct(${p.id})" class="text-xs bg-red-50 text-red-600 border border-red-200 px-2.5 py-1 rounded hover:bg-red-100 transition">Remove</button>
                         </td>
                     </tr>
                 `;
@@ -620,7 +620,7 @@
 
             } catch (err) {
                 alert("Upload error: " + err.message);
-            } finally {
+            } font-black {
                 btn.disabled = false;
                 btn.innerHTML = `<span>📤 Upload Photos & Publish Product</span>`;
             }
