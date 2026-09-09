@@ -3,266 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XENNNSTOREE | Admin Console</title>
+    <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Space Grotesk', sans-serif; background: #f8fafc; color: #0f172a; }
-        .admin-card { background: #ffffff; border: 1px solid #e2e8f0; }
-    </style>
 </head>
-<body class="min-h-screen flex flex-col justify-center items-center p-4 md:p-8">
+<body class="min-h-screen flex flex-col justify-center items-center p-4 md:p-8 bg-slate-50 text-slate-900 font-sans">
 
-    <!-- Login Screen Section -->
-    <div id="login-screen" class="w-full max-w-md admin-card p-8 rounded-3xl space-y-6 shadow-xl">
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="w-full max-w-md bg-white p-8 rounded-2xl border border-slate-200 shadow-xl space-y-6">
         <div class="text-center space-y-2">
-            <h1 class="text-3xl font-black text-red-600 uppercase tracking-tight">XENNN<span class="text-slate-900">STOREE</span></h1>
-            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Owner Portal Authentication</p>
+            <h1 class="text-2xl font-black tracking-tight text-slate-900">Admin Login</h1>
+            <p class="text-sm text-slate-500 font-medium">Enter credentials to access management</p>
         </div>
 
         <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Email Address *</label>
-                <input type="email" id="login-email" required placeholder="owner@xennnstoree.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-red-600 font-bold">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email</label>
+                <input type="email" id="login-email" required placeholder="aminegambull@gmail.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 font-medium transition text-sm">
             </div>
 
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Password *</label>
-                <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-red-600 font-bold">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 font-medium transition text-sm">
             </div>
 
-            <div id="login-error" class="text-xs text-red-600 font-bold hidden text-center bg-red-50 border border-red-200 p-2.5 rounded-xl">
-                Invalid owner credentials. Please try again.
+            <div id="login-error" class="hidden p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-bold rounded-xl text-center">
+                Invalid email or password.
             </div>
 
-            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3.5 rounded-xl transition shadow-lg shadow-red-600/20">
-                Sign In to Dashboard
+            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-500/20 transition duration-200 text-sm">
+                Sign In
             </button>
         </form>
-
-        <div class="text-center">
-            <a href="index.html" class="text-xs text-slate-400 hover:text-slate-800 underline">Return to Public Storefront</a>
-        </div>
     </div>
 
-    <!-- Main Admin Dashboard (Hidden Until Authenticated) -->
-    <div id="admin-dashboard" class="w-full max-w-7xl mx-auto space-y-8 hidden">
-
-        <!-- Admin Header -->
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-4">
+    <!-- DASHBOARD SCREEN -->
+    <div id="admin-dashboard" class="hidden w-full space-y-8">
+        
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-3xl font-black text-red-600 uppercase tracking-tight">XENNNSTOREE <span class="text-slate-900">ADMIN</span></h1>
-                    <span class="bg-red-50 text-red-600 border border-red-200 text-[10px] font-black px-2 py-0.5 rounded uppercase" id="owner-tag">Amine (Owner)</span>
-                </div>
-                <p class="text-xs text-slate-500">Manage Drops, Catalog, Local Orders, Stock & Custom Imports</p>
+                <h1 class="text-xl font-black text-slate-900">Store Management Console</h1>
+                <p class="text-xs text-slate-500 font-medium">Manage catalog, orders, and stock statuses</p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2 rounded-xl text-xs uppercase transition border border-slate-200">
-                    🌐 Storefront
-                </a>
-                <button onclick="fetchAdminData()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2 rounded-xl text-xs uppercase transition border border-slate-200">
-                    🔄 Refresh
-                </button>
-                <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase transition">
-                    🚪 Sign Out
-                </button>
-            </div>
+            <button onclick="handleLogout()" class="self-start md:self-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200">
+                Log Out
+            </button>
         </header>
 
-        <!-- Overview Statistics -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="admin-card p-5 rounded-2xl shadow-sm">
-                <span class="text-xs font-bold uppercase text-slate-500 block mb-1">Total Products</span>
-                <span class="text-3xl font-black text-slate-900" id="stat-products">0</span>
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Orders</span>
+                <p id="stat-total-orders" class="text-2xl font-black text-slate-900">0</p>
             </div>
-            <div class="admin-card p-5 rounded-2xl shadow-sm">
-                <span class="text-xs font-bold uppercase text-slate-500 block mb-1">In-Stock Items</span>
-                <span class="text-3xl font-black text-emerald-600" id="stat-in-stock">0</span>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Products</span>
+                <p id="stat-products" class="text-2xl font-black text-slate-900">0</p>
             </div>
-            <div class="admin-card p-5 rounded-2xl shadow-sm">
-                <span class="text-xs font-bold uppercase text-slate-500 block mb-1">Out of Stock Items</span>
-                <span class="text-3xl font-black text-red-600" id="stat-out-stock">0</span>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">In Stock</span>
+                <p id="stat-in-stock" class="text-2xl font-black text-emerald-600">0</p>
             </div>
-            <div class="admin-card p-5 rounded-2xl shadow-sm">
-                <span class="text-xs font-bold uppercase text-slate-500 block mb-1">Total Orders</span>
-                <span class="text-3xl font-black text-amber-600" id="stat-total-orders">0</span>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Out of Stock</span>
+                <p id="stat-out-stock" class="text-2xl font-black text-red-600">0</p>
             </div>
-        </section>
+        </div>
 
-        <!-- Add New Product Form Section -->
-        <section class="admin-card p-6 rounded-3xl space-y-4 shadow-sm">
-            <h2 class="text-xl font-black uppercase text-slate-900 flex items-center gap-2">
-                <span>➕</span> Add New Local Drop
-            </h2>
-            <form id="add-product-form" onsubmit="handleAddProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <div class="sm:col-span-2 md:col-span-1">
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Title / Name *</label>
-                    <input type="text" id="p-title" required placeholder="e.g. Y2K Oversized Graphic Hoodie" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600">
+        <!-- Add Product Form -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h2 class="text-base font-bold text-slate-900">Publish New Item</h2>
+            
+            <form id="add-product-form" onsubmit="handleAddProduct(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Product Title</label>
+                        <input type="text" id="p-title" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Price (DZD)</label>
+                        <input type="number" id="p-price" step="0.01" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Size / Variant</label>
+                        <input type="text" id="p-size" required placeholder="Standard / M / L" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                    </div>
                 </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Stock Availability</label>
+                        <select id="p-instock" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                            <option value="true">In Stock</option>
+                            <option value="false">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Product Images</label>
+                        <input type="file" id="p-images-file" multiple accept="image/*" onchange="previewImages(event)" class="w-full px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium focus:outline-none">
+                    </div>
+                </div>
+
+                <div id="preview-container" class="hidden">
+                    <span class="block text-xs font-bold text-slate-500 uppercase mb-2">Selected Previews</span>
+                    <div id="image-previews" class="flex flex-wrap gap-2"></div>
+                </div>
+
                 <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Price (DZD) *</label>
-                    <input type="number" id="p-price" required placeholder="4500" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Size *</label>
-                    <select id="p-size" required class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600">
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL" selected>XL</option>
-                        <option value="XXL">XXL</option>
-                        <option value="Oversized Fit">Oversized Fit</option>
-                    </select>
-                </div>
-                
-                <div class="sm:col-span-2 md:col-span-2">
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Upload Product Photos *</label>
-                    <input type="file" id="p-images-file" accept="image/*" multiple required onchange="previewImages(event)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-600 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-red-600 file:text-white hover:file:bg-red-700 cursor-pointer">
-                    <p class="text-[10px] text-slate-400 mt-1">Pick multiple pictures directly from your device storage.</p>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Description</label>
+                    <textarea id="p-desc" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium"></textarea>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Initial Stock Status *</label>
-                    <select id="p-instock" required class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600">
-                        <option value="true" selected>In Stock</option>
-                        <option value="false">Out of Stock</option>
-                    </select>
-                </div>
-
-                <!-- Preview Area -->
-                <div class="sm:col-span-2 md:col-span-3 hidden" id="preview-container">
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Selected Photos Preview:</label>
-                    <div id="image-previews" class="flex flex-wrap gap-3"></div>
-                </div>
-
-                <div class="sm:col-span-2 md:col-span-3">
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Description</label>
-                    <textarea id="p-desc" rows="2" placeholder="Item condition, fit specifications, material..." class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-600"></textarea>
-                </div>
-
-                <div class="sm:col-span-2 md:col-span-3">
-                    <button type="submit" id="add-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3.5 rounded-xl transition shadow-lg shadow-red-600/20 flex items-center justify-center gap-2">
-                        <span>📤 Upload Photos & Publish Product</span>
-                    </button>
-                </div>
+                <button type="submit" id="add-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-md shadow-red-500/10 text-xs">
+                    <span>📤 Upload Photos & Publish Product</span>
+                </button>
             </form>
-        </section>
+        </div>
 
         <!-- Navigation Tabs -->
-        <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
-            <button id="tab-btn-local" onclick="switchAdminTab('local')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition">
-                📦 In-Stock Orders (<span id="tab-count-local">0</span>)
+        <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+            <button id="tab-btn-local" onclick="switchAdminTab('local')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition shadow-sm">
+                Standard Orders (<span id="tab-count-local">0</span>)
             </button>
             <button id="tab-btn-imports" onclick="switchAdminTab('imports')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200">
-                ✈️ Global Import Requests (<span id="tab-count-imports">0</span>)
+                Custom Imports (<span id="tab-count-imports">0</span>)
             </button>
             <button id="tab-btn-stock" onclick="switchAdminTab('stock')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200">
-                📊 Stock Management (<span id="tab-count-stock">0</span>)
+                Stock Status (<span id="tab-count-stock">0</span>)
             </button>
             <button id="tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200">
-                🏷️ Manage Inventory (<span id="tab-count-products">0</span>)
+                All Products (<span id="tab-count-products">0</span>)
             </button>
         </div>
 
-        <!-- Tab 1: In-Stock Orders -->
-        <section id="tab-view-local" class="space-y-4">
-            <h2 class="text-lg font-bold uppercase text-slate-800">Local Inventory Orders</h2>
-            <div class="overflow-x-auto admin-card rounded-2xl shadow-sm">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-200">
-                        <tr>
+        <!-- Tab Content Views -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            
+            <!-- Standard Orders -->
+            <div id="tab-view-local" class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
                             <th class="p-4">Order ID</th>
-                            <th class="p-4">Customer Name</th>
+                            <th class="p-4">Customer</th>
                             <th class="p-4">Phone</th>
                             <th class="p-4">Location</th>
                             <th class="p-4">Address</th>
-                            <th class="p-4">Item Name / Product</th>
+                            <th class="p-4">Item</th>
                             <th class="p-4">Date</th>
-                            <th class="p-4 text-right">Action</th>
+                            <th class="p-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="table-local-orders" class="divide-y divide-slate-200">
-                        <tr><td colspan="8" class="p-4 text-center text-slate-400">Loading local orders...</td></tr>
-                    </tbody>
+                    <tbody id="table-local-orders" class="divide-y divide-slate-100 font-medium"></tbody>
                 </table>
             </div>
-        </section>
 
-        <!-- Tab 2: Global Import Requests -->
-        <section id="tab-view-imports" class="space-y-4 hidden">
-            <h2 class="text-lg font-bold uppercase text-slate-800">AliExpress / Shein / Temu Custom Import Orders</h2>
-            <div class="overflow-x-auto admin-card rounded-2xl shadow-sm">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-200">
-                        <tr>
-                            <th class="p-4">ID</th>
-                            <th class="p-4">Customer Name</th>
+            <!-- Custom Imports -->
+            <div id="tab-view-imports" class="hidden overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                            <th class="p-4">Order ID</th>
+                            <th class="p-4">Customer</th>
                             <th class="p-4">Phone</th>
-                            <th class="p-4">Location & Address</th>
-                            <th class="p-4">Calculated Price / Details</th>
-                            <th class="p-4">Product Link</th>
-                            <th class="p-4 text-right">Action</th>
+                            <th class="p-4">Location</th>
+                            <th class="p-4">Quote</th>
+                            <th class="p-4">Import Link</th>
+                            <th class="p-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="table-import-orders" class="divide-y divide-slate-200">
-                        <tr><td colspan="7" class="p-4 text-center text-slate-400">Loading import requests...</td></tr>
-                    </tbody>
+                    <tbody id="table-import-orders" class="divide-y divide-slate-100 font-medium"></tbody>
                 </table>
             </div>
-        </section>
 
-        <!-- Tab 3: Stock Management -->
-        <section id="tab-view-stock" class="space-y-4 hidden">
-            <h2 class="text-lg font-bold uppercase text-slate-800">Stock Availability Control</h2>
-            <div class="overflow-x-auto admin-card rounded-2xl shadow-sm">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-200">
-                        <tr>
+            <!-- Stock Status -->
+            <div id="tab-view-stock" class="hidden overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
                             <th class="p-4">Product</th>
-                            <th class="p-4">Size</th>
-                            <th class="p-4">Price</th>
-                            <th class="p-4">Current Availability</th>
-                            <th class="p-4 text-right">Stock Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-stock" class="divide-y divide-slate-200">
-                        <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading stock data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Tab 4: Inventory / Product List Management -->
-        <section id="tab-view-products" class="space-y-4 hidden">
-            <h2 class="text-lg font-bold uppercase text-slate-800">Active Inventory Drops</h2>
-            <div class="overflow-x-auto admin-card rounded-2xl shadow-sm">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-200">
-                        <tr>
-                            <th class="p-4">Photos</th>
-                            <th class="p-4">Title</th>
-                            <th class="p-4">Size</th>
+                            <th class="p-4">Variant</th>
                             <th class="p-4">Price</th>
                             <th class="p-4">Status</th>
-                            <th class="p-4">ID</th>
-                            <th class="p-4 text-right">Action</th>
+                            <th class="p-4 text-right">Toggle Stock</th>
                         </tr>
                     </thead>
-                    <tbody id="table-products" class="divide-y divide-slate-200">
-                        <tr><td colspan="7" class="p-4 text-center text-slate-400">Loading product list...</td></tr>
-                    </tbody>
+                    <tbody id="table-stock" class="divide-y divide-slate-100 font-medium"></tbody>
                 </table>
             </div>
-        </section>
 
+            <!-- All Products -->
+            <div id="tab-view-products" class="hidden overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                            <th class="p-4">Preview</th>
+                            <th class="p-4">Title</th>
+                            <th class="p-4">Variant</th>
+                            <th class="p-4">Price</th>
+                            <th class="p-4">Stock</th>
+                            <th class="p-4">Database ID</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-products" class="divide-y divide-slate-100 font-medium"></tbody>
+                </table>
+            </div>
+
+        </div>
     </div>
 
+    <!-- SCRIPT LOGIC -->
     <script>
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
-        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let _supabase = null;
+        try {
+            if (window.supabase) {
+                _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } else {
+                console.error("Supabase SDK failed to load from CDN.");
+            }
+        } catch (e) {
+            console.error("Supabase initialization error:", e);
+        }
 
         const OWNER_CREDENTIALS = {
             email: "aminegambull@gmail.com",
@@ -280,29 +246,39 @@
             const adminDashboard = document.getElementById("admin-dashboard");
 
             if (session === "authenticated_amine") {
-                loginScreen.classList.add("hidden");
-                adminDashboard.classList.remove("hidden");
-                document.body.className = "p-4 md:p-8 max-w-7xl mx-auto space-y-8 min-h-screen";
+                if (loginScreen) loginScreen.classList.add("hidden");
+                if (adminDashboard) adminDashboard.classList.remove("hidden");
+                document.body.className = "p-4 md:p-8 max-w-7xl mx-auto space-y-8 min-h-screen bg-slate-50 text-slate-900 font-sans";
                 fetchAdminData();
             } else {
-                loginScreen.classList.remove("hidden");
-                adminDashboard.classList.add("hidden");
-                document.body.className = "min-h-screen flex flex-col justify-center items-center p-4 md:p-8";
+                if (loginScreen) loginScreen.classList.remove("hidden");
+                if (adminDashboard) adminDashboard.classList.add("hidden");
+                document.body.className = "min-h-screen flex flex-col justify-center items-center p-4 md:p-8 bg-slate-50 text-slate-900 font-sans";
             }
         }
 
         function handleLogin(e) {
             e.preventDefault();
-            const emailInput = document.getElementById("login-email").value.trim();
-            const passwordInput = document.getElementById("login-password").value;
-            const errorMsg = document.getElementById("login-error");
+            
+            try {
+                const emailInput = document.getElementById("login-email").value.trim().toLowerCase();
+                const passwordInput = document.getElementById("login-password").value.trim();
+                const errorMsg = document.getElementById("login-error");
 
-            if (emailInput.toLowerCase() === OWNER_CREDENTIALS.email.toLowerCase() && passwordInput === OWNER_CREDENTIALS.password) {
-                localStorage.setItem("admin_session", "authenticated_amine");
-                errorMsg.classList.add("hidden");
-                checkAuth();
-            } else {
-                errorMsg.classList.remove("hidden");
+                if (emailInput === OWNER_CREDENTIALS.email.toLowerCase() && passwordInput === OWNER_CREDENTIALS.password) {
+                    localStorage.setItem("admin_session", "authenticated_amine");
+                    if (errorMsg) errorMsg.classList.add("hidden");
+                    checkAuth();
+                } else {
+                    if (errorMsg) {
+                        errorMsg.classList.remove("hidden");
+                    } else {
+                        alert("Invalid credentials entered.");
+                    }
+                }
+            } catch (err) {
+                alert("Login Error: " + err.message);
+                console.error(err);
             }
         }
 
@@ -314,10 +290,12 @@
         function previewImages(event) {
             const container = document.getElementById('preview-container');
             const previews = document.getElementById('image-previews');
+            if (!container || !previews) return;
+            
             previews.innerHTML = '';
-
             const files = event.target.files;
-            if (files.length > 0) {
+            
+            if (files && files.length > 0) {
                 container.classList.remove('hidden');
                 Array.from(files).forEach(file => {
                     const reader = new FileReader();
@@ -348,22 +326,24 @@
             const activeClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition shadow-sm";
             const inactiveClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200";
 
-            btnLocal.className = tab === 'local' ? activeClass : inactiveClass;
-            btnImports.className = tab === 'imports' ? activeClass : inactiveClass;
-            btnStock.className = tab === 'stock' ? activeClass : inactiveClass;
-            btnProducts.className = tab === 'products' ? activeClass : inactiveClass;
+            if (btnLocal) btnLocal.className = tab === 'local' ? activeClass : inactiveClass;
+            if (btnImports) btnImports.className = tab === 'imports' ? activeClass : inactiveClass;
+            if (btnStock) btnStock.className = tab === 'stock' ? activeClass : inactiveClass;
+            if (btnProducts) btnProducts.className = tab === 'products' ? activeClass : inactiveClass;
 
-            viewLocal.classList.toggle('hidden', tab !== 'local');
-            viewImports.classList.toggle('hidden', tab !== 'imports');
-            viewStock.classList.toggle('hidden', tab !== 'stock');
-            viewProducts.classList.toggle('hidden', tab !== 'products');
+            if (viewLocal) viewLocal.classList.toggle('hidden', tab !== 'local');
+            if (viewImports) viewImports.classList.toggle('hidden', tab !== 'imports');
+            if (viewStock) viewStock.classList.toggle('hidden', tab !== 'stock');
+            if (viewProducts) viewProducts.classList.toggle('hidden', tab !== 'products');
         }
 
         async function fetchAdminData() {
+            if (!_supabase) return;
             await Promise.all([fetchOrders(), fetchProducts()]);
         }
 
         async function fetchOrders() {
+            if (!_supabase) return;
             const { data, error } = await _supabase
                 .from('orders')
                 .select('*, products(id, title)')
@@ -377,10 +357,13 @@
             localOrdersList = data.filter(o => !o.import_url);
             importOrdersList = data.filter(o => o.import_url);
 
-            document.getElementById('stat-total-orders').textContent = data.length;
+            const totalOrdersEl = document.getElementById('stat-total-orders');
+            const countLocalEl = document.getElementById('tab-count-local');
+            const countImportsEl = document.getElementById('tab-count-imports');
 
-            document.getElementById('tab-count-local').textContent = localOrdersList.length;
-            document.getElementById('tab-count-imports').textContent = importOrdersList.length;
+            if (totalOrdersEl) totalOrdersEl.textContent = data.length;
+            if (countLocalEl) countLocalEl.textContent = localOrdersList.length;
+            if (countImportsEl) countImportsEl.textContent = importOrdersList.length;
 
             renderLocalOrders();
             renderImportOrders();
@@ -388,6 +371,7 @@
 
         function renderLocalOrders() {
             const tbody = document.getElementById('table-local-orders');
+            if (!tbody) return;
             if (localOrdersList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-bold">No standard in-stock orders.</td></tr>`;
                 return;
@@ -416,14 +400,15 @@
 
         function renderImportOrders() {
             const tbody = document.getElementById('table-import-orders');
+            if (!tbody) return;
             if (importOrdersList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-bold">No custom import requests.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = importOrdersList.map(o => {
-                const parts = o.import_url.split(' | ');
-                const rawUrl = parts[0];
+                const parts = (o.import_url || '').split(' | ');
+                const rawUrl = parts[0] || '#';
                 const priceTag = parts[1] || 'N/A';
 
                 return `
@@ -447,6 +432,7 @@
         }
 
         async function fetchProducts() {
+            if (!_supabase) return;
             const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: false });
 
             if (error) {
@@ -454,16 +440,21 @@
                 return;
             }
 
-            productsList = data;
+            productsList = data || [];
             const inStockCount = productsList.filter(p => p.in_stock !== false).length;
             const outStockCount = productsList.length - inStockCount;
 
-            document.getElementById('stat-products').textContent = productsList.length;
-            document.getElementById('stat-in-stock').textContent = inStockCount;
-            document.getElementById('stat-out-stock').textContent = outStockCount;
+            const statProd = document.getElementById('stat-products');
+            const statIn = document.getElementById('stat-in-stock');
+            const statOut = document.getElementById('stat-out-stock');
+            const countStock = document.getElementById('tab-count-stock');
+            const countProducts = document.getElementById('tab-count-products');
 
-            document.getElementById('tab-count-stock').textContent = productsList.length;
-            document.getElementById('tab-count-products').textContent = productsList.length;
+            if (statProd) statProd.textContent = productsList.length;
+            if (statIn) statIn.textContent = inStockCount;
+            if (statOut) statOut.textContent = outStockCount;
+            if (countStock) countStock.textContent = productsList.length;
+            if (countProducts) countProducts.textContent = productsList.length;
 
             renderStockManagement();
             renderProductsTable();
@@ -471,6 +462,7 @@
 
         function renderStockManagement() {
             const tbody = document.getElementById('table-stock');
+            if (!tbody) return;
             if (productsList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 font-bold">No items found in catalog.</td></tr>`;
                 return;
@@ -491,7 +483,7 @@
                             </div>
                         </td>
                         <td class="p-4"><span class="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded border border-slate-200">${p.size}</span></td>
-                        <td class="p-4 font-bold text-slate-900">${p.price} DZD</span></td>
+                        <td class="p-4 font-bold text-slate-900">${p.price} DZD</td>
                         <td class="p-4">
                             ${isStocked 
                                 ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-[10px] px-2.5 py-1 rounded-lg uppercase">🟢 In Stock</span>`
@@ -510,6 +502,7 @@
 
         function renderProductsTable() {
             const tbody = document.getElementById('table-products');
+            if (!tbody) return;
             if (productsList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-bold">No products in database.</td></tr>`;
                 return;
@@ -547,6 +540,7 @@
         }
 
         async function toggleStock(productId, status) {
+            if (!_supabase) return;
             const { error } = await _supabase
                 .from('products')
                 .update({ in_stock: status })
@@ -561,6 +555,11 @@
 
         async function handleAddProduct(e) {
             e.preventDefault();
+            if (!_supabase) {
+                alert("Supabase client is not connected.");
+                return;
+            }
+
             const btn = document.getElementById('add-btn');
             const fileInput = document.getElementById('p-images-file');
             const files = fileInput.files;
@@ -627,6 +626,7 @@
         }
 
         async function deleteOrder(id) {
+            if (!_supabase) return;
             if (!confirm(`Are you sure you want to delete order #${id}?`)) return;
             const { error } = await _supabase.from('orders').delete().eq('id', id);
             if (error) alert("Could not delete order: " + error.message);
@@ -634,12 +634,14 @@
         }
 
         async function deleteProduct(id) {
+            if (!_supabase) return;
             if (!confirm(`Are you sure you want to delete product #${id}?`)) return;
             const { error } = await _supabase.from('products').delete().eq('id', id);
             if (error) alert("Could not delete product: " + error.message);
             else fetchProducts();
         }
 
+        document.addEventListener('DOMContentLoaded', checkAuth);
         checkAuth();
     </script>
 </body>
