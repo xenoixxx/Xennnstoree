@@ -3,22 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XENNNSTOREE | Streetwear & Drops</title>
+    <title>XENNNSTOREE | Algerian Streetwear & Custom Imports</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brandRed: '#ef4444',
-                        brandRedDark: '#dc2626',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body {
             background-color: #fafafa;
@@ -42,7 +30,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between relative">
+<body class="min-h-screen flex flex-col justify-between">
 
     <!-- Header Navigation -->
     <header class="bg-white/90 backdrop-blur-md border-b border-red-200 px-6 py-4 sticky top-0 z-40 flex justify-between items-center">
@@ -50,253 +38,126 @@
             <span class="text-2xl font-black tracking-tight text-zinc-950">XENNN<span class="text-red-600">STOREE</span></span>
             <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded uppercase border border-red-300">DZ</span>
         </a>
-
-        <!-- Header Controls -->
-        <div class="flex items-center gap-3">
-            <a href="cart.html" class="bg-red-50 border border-red-300 text-red-600 hover:bg-red-100 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition">
-                🛒 (<span id="cart-count">0</span>)
-            </a>
-
-            <!-- Three Stripes Menu Button -->
-            <button onclick="toggleMenu()" class="p-2.5 text-zinc-950 hover:text-red-600 focus:outline-none rounded-xl border border-red-200 bg-white shadow-sm transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
+        <div class="flex items-center gap-4">
+            <button onclick="openImportModal()" class="text-xs font-bold bg-red-50 text-red-600 border border-red-200 px-3 py-2 rounded-xl hover:bg-red-100 transition uppercase">
+                + Import Request
             </button>
+            <a href="cart.html" class="relative text-xs font-bold text-zinc-950 uppercase hover:text-red-600 transition">
+                Basket
+                <span id="cart-count" class="ml-1 bg-red-600 text-white rounded-full px-2 py-0.5 text-[10px] font-black">0</span>
+            </a>
         </div>
     </header>
 
-    <!-- Slide-Out Drawer Navigation Menu -->
-    <div id="nav-drawer" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity" onclick="toggleMenu()">
-        <div class="fixed top-0 right-0 w-80 h-full bg-white p-6 shadow-2xl space-y-6 border-l border-red-200 overflow-y-auto" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-red-100 pb-4">
-                <span class="font-black text-lg uppercase text-zinc-950">Menu Navigation</span>
-                <button onclick="toggleMenu()" class="text-zinc-500 font-black text-2xl hover:text-red-600">&times;</button>
+    <!-- Main Store Content -->
+    <main class="max-w-6xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
+        <!-- Hero Section -->
+        <section class="text-center space-y-4 max-w-2xl mx-auto">
+            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tight text-zinc-950">
+                Exclusive <span class="text-red-600">Drops</span> & Imports
+            </h1>
+            <p class="text-sm text-zinc-600">Fast shipping across all 58 Wilayas in Algeria. Cash on Delivery available.</p>
+        </section>
+
+        <!-- Products Grid -->
+        <section>
+            <h2 class="text-2xl font-black uppercase mb-6 text-zinc-950 border-b border-red-200 pb-2">Available Products</h2>
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Products loaded dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Import Request Modal -->
+    <div id="import-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="y2k-card p-6 md:p-8 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto space-y-6 border-2 border-red-300 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-red-100 pb-3">
+                <h3 class="text-xl font-black uppercase text-zinc-950">Custom Import Request</h3>
+                <button onclick="closeImportModal()" class="text-zinc-400 hover:text-zinc-950 font-bold text-lg">✕</button>
             </div>
 
-            <nav class="space-y-6">
-                <!-- Category Section -->
+            <form id="import-order-form" onsubmit="handleImportOrder(event)" class="space-y-4">
                 <div>
-                    <span class="text-[10px] font-black tracking-widest text-zinc-400 uppercase block mb-2">Browse Clothing Types</span>
-                    <div class="space-y-1">
-                        <button onclick="filterCategory('all'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
-                            <span>🔥 All Drops</span>
-                            <span class="text-xs text-zinc-400 font-normal">View All</span>
-                        </button>
-                        <button onclick="filterCategory('Hoodies'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
-                            <span>🧥 Hoodies & Zip-ups</span>
-                        </button>
-                        <button onclick="filterCategory('T-Shirts'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
-                            <span>👕 T-Shirts & Tops</span>
-                        </button>
-                        <button onclick="filterCategory('Pants'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
-                            <span>👖 Pants & Sweatpants</span>
-                        </button>
-                        <button onclick="filterCategory('Outerwear'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
-                            <span>🧥 Jackets & Outerwear</span>
-                        </button>
-                        <button onclick="filterCategory('Accessories'); toggleMenu();" class="w-full text-left font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition flex items-center justify-between">
-                            <span>🧢 Accessories & Caps</span>
-                        </button>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Product URL / Item Link *</label>
+                    <input type="url" id="import-url" required placeholder="https://..." class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Item Price in USD ($) *</label>
+                    <input type="number" step="0.01" id="import-usd-price" required placeholder="e.g. 25.00" oninput="calculateTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Wilaya *</label>
+                        <select id="import-wilaya" required onchange="calculateTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                            <option value="">Select Wilaya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Delivery Type *</label>
+                        <select id="import-delivery-type" required onchange="calculateTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                            <option value="home">Home Delivery</option>
+                            <option value="desk">Stop Desk</option>
+                        </select>
                     </div>
                 </div>
 
-                <!-- Custom Import Section -->
-                <div class="border-t border-red-100 pt-4">
-                    <span class="text-[10px] font-black tracking-widest text-zinc-400 uppercase block mb-2">Global Import Service</span>
-                    <button onclick="toggleMenu(); openImportModal();" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-3 px-4 rounded-xl shadow-md transition flex items-center justify-between">
-                        <span>📦 Order Shein / AliExpress / Temu</span>
-                        <span class="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded">Agent</span>
-                    </button>
-                </div>
-
-                <!-- Links Section -->
-                <div class="border-t border-red-100 pt-4 space-y-1">
-                    <a href="#about-section" onclick="toggleMenu()" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition">
-                        ℹ️ About Us
-                    </a>
-                    <a href="#contact-section" onclick="toggleMenu()" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition">
-                        📞 Contact Information
-                    </a>
-                    <a href="cart.html" class="block font-bold text-zinc-800 hover:text-red-600 uppercase text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition">
-                        🛒 View Shopping Basket (<span class="menu-cart-count">0</span>)
-                    </a>
-                </div>
-            </nav>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-16">
-
-        <!-- Hero Section -->
-        <section class="y2k-card p-8 rounded-3xl text-center space-y-4">
-            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tight text-zinc-950">
-                Exclusive Streetwear <span class="text-red-600">& Local Drops</span>
-            </h1>
-            <p class="text-zinc-600 text-sm md:text-base max-w-2xl mx-auto">
-                Explore in-stock localized drops or tap the top-right menu (☰) to order directly from AliExpress, Shein, and Temu with 58 Wilaya delivery.
-            </p>
-        </section>
-
-        <!-- Product Catalog Section -->
-        <section id="catalog-section">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-black uppercase text-zinc-950" id="catalog-title">In-Stock Catalog</h2>
-                    <p class="text-xs text-zinc-500 hidden" id="filter-active-indicator">Showing filtered items</p>
-                </div>
-                <button onclick="filterCategory('all')" id="reset-filter-btn" class="hidden text-xs font-bold text-red-600 underline">Show All</button>
-            </div>
-            
-            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <div class="col-span-full text-center py-12 text-zinc-400">Loading catalog...</div>
-            </div>
-        </section>
-
-        <!-- About Us Section -->
-        <section id="about-section" class="y2k-card p-8 rounded-3xl space-y-4">
-            <span class="bg-red-100 text-red-600 text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider">Who We Are</span>
-            <h2 class="text-3xl font-black uppercase text-zinc-950">About XENNNSTOREE</h2>
-            <p class="text-zinc-600 text-sm leading-relaxed max-w-4xl">
-                XENNNSTOREE is an independent streetwear hub based in Algeria, created to bring underground fashion, Y2K aesthetics, and premium global apparel directly to your doorstep. Alongside our exclusive in-house local drops, we provide a full-service import solution allowing customers across all 58 Wilayas to seamlessly buy items from international platforms like AliExpress, Shein, and Temu with local DZD cash-on-delivery.
-            </p>
-        </section>
-
-        <!-- Contact Information Section -->
-        <section id="contact-section" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="y2k-card p-6 rounded-2xl space-y-2">
-                <div class="text-red-600 font-black text-2xl">📱 Direct Contact</div>
-                <h3 class="font-bold uppercase text-zinc-950">Customer Support</h3>
-                <p class="text-xs text-zinc-600">Call or message us for order confirmations and inquiries.</p>
-                <a href="tel:+213500000000" class="block font-black text-red-600 hover:underline text-sm pt-2">+213 5XX XX XX XX</a>
-            </div>
-
-            <div class="y2k-card p-6 rounded-2xl space-y-2">
-                <div class="text-red-600 font-black text-2xl">📸 Instagram</div>
-                <h3 class="font-bold uppercase text-zinc-950">Follow Our Drops</h3>
-                <p class="text-xs text-zinc-600">Check out new stock releases, fit pictures, and customer reviews.</p>
-                <a href="https://instagram.com" target="_blank" class="block font-black text-red-600 hover:underline text-sm pt-2">@xennnstoree</a>
-            </div>
-
-            <div class="y2k-card p-6 rounded-2xl space-y-2">
-                <div class="text-red-600 font-black text-2xl">🚚 Nationwide Delivery</div>
-                <h3 class="font-bold uppercase text-zinc-950">58 Wilayas</h3>
-                <p class="text-xs text-zinc-600">Home delivery or desktop stop-desk collection available across all regions.</p>
-                <span class="block font-black text-zinc-950 text-sm pt-2">Algérie Poste / Local Express</span>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-red-200 mt-16 py-8 px-6 text-center text-xs text-zinc-500">
-        <p>&copy; 2026 XENNNSTOREE. All Rights Reserved. Delivered across all 58 Wilayas.</p>
-    </footer>
-
-    <!-- Modal Popup Window: Shein / AliExpress / Temu Agent Ordering with Dynamic Wilaya Delivery Rates -->
-    <div id="import-modal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImportModal()">
-        <div class="y2k-card w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 space-y-6 overflow-y-auto max-h-[90vh] border-2 border-red-300" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-red-100 pb-3">
-                <div>
-                    <span class="bg-red-100 text-red-600 text-[10px] font-black px-2.5 py-0.5 rounded uppercase">Agent Import Service</span>
-                    <h2 class="text-2xl font-black uppercase text-zinc-950 mt-1">Order Global Products</h2>
-                </div>
-                <button onclick="closeImportModal()" class="text-zinc-400 font-black text-2xl hover:text-red-600">&times;</button>
-            </div>
-
-            <p class="text-xs text-zinc-600">Paste your product URL from Shein, AliExpress, or Temu. Enter the price in USD ($) to see the calculated item price and delivery rates.</p>
-
-            <form id="import-order-form" onsubmit="handleImportOrder(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Product Link (URL) *</label>
-                    <input type="url" id="import-url" required placeholder="https://www.aliexpress.com/item... or Shein/Temu link" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                </div>
-
-                <!-- Price Calculator Inputs -->
-                <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Price on Website ($ USD) *</label>
-                    <input type="number" step="0.01" min="1" id="import-usd-price" required placeholder="e.g. 15.50" oninput="calculateTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 font-bold">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Estimated Item Price (DZD)</label>
-                    <div id="import-dzd-preview" class="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-black text-red-600 flex items-center justify-between">
-                        <span>0 DZD</span>
-                        <span class="text-[10px] text-zinc-400 font-normal">(Rate: 255 + 15%)</span>
+                <!-- Live Price Breakdown Box -->
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-4 space-y-2 text-xs">
+                    <div class="flex justify-between text-zinc-600">
+                        <span>Converted Price (USD → DZD):</span>
+                        <span id="summary-dzd-price" class="font-bold text-zinc-950">0 DZD</span>
+                    </div>
+                    <div class="flex justify-between text-zinc-600">
+                        <span>Delivery Fee:</span>
+                        <span id="summary-shipping-fee" class="font-bold text-red-600">Select Wilaya</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-black text-red-600 border-t border-red-200 pt-2">
+                        <span>Total Estimated Cost:</span>
+                        <span id="summary-grand-total">0 DZD</span>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Full Name *</label>
-                    <input type="text" id="import-name" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <input type="text" id="import-name" required placeholder="e.g. Amine Batata" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
                 </div>
+
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Phone Number *</label>
-                    <input type="tel" id="import-phone" required placeholder="05XX XX XX XX" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                </div>
-
-                <!-- Wilaya & Delivery Method Selection -->
-                <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Wilaya *</label>
-                    <select id="import-wilaya" required onchange="updateDeliveryOptions()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                        <option value="">Select Wilaya</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Delivery Type *</label>
-                    <select id="import-delivery-type" required onchange="calculateTotals()" class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
-                        <option value="home">Home Delivery (À domicile)</option>
-                        <option value="desk">Stop Desk / Agency</option>
-                    </select>
+                    <input type="tel" id="import-phone" required placeholder="05XX XX XX XX" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Commune *</label>
-                    <input type="text" id="import-commune" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <input type="text" id="import-commune" required placeholder="e.g. Mahelma" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Street Address *</label>
-                    <input type="text" id="import-address" required class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <input type="text" id="import-address" required placeholder="e.g. Cité 1256 Logements" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
                 </div>
 
-                <!-- Summary Box -->
-                <div class="md:col-span-2 bg-red-50 border border-red-200 rounded-xl p-4 space-y-1 text-xs">
-                    <div class="flex justify-between text-zinc-600">
-                        <span>Item Subtotal:</span>
-                        <span id="summary-item-price" class="font-bold">0 DZD</span>
-                    </div>
-                    <div class="flex justify-between text-zinc-600">
-                        <span>Delivery Fee:</span>
-                        <span id="summary-shipping-fee" class="font-bold">0 DZD</span>
-                    </div>
-                    <div class="flex justify-between text-sm font-black text-red-600 border-t border-red-200 pt-2 mt-1">
-                        <span>Grand Total:</span>
-                        <span id="summary-grand-total">0 DZD</span>
-                    </div>
-                </div>
-
-                <div class="md:col-span-2">
-                    <button type="submit" id="import-submit-btn" class="w-full y2k-btn py-3.5 rounded-xl text-white font-black uppercase tracking-wider text-xs">
-                        Submit Import Request
-                    </button>
-                </div>
+                <button type="submit" id="import-submit-btn" class="w-full y2k-btn py-3.5 rounded-xl text-white font-black uppercase tracking-wider text-xs shadow-md">
+                    Submit Import Request
+                </button>
             </form>
         </div>
     </div>
+
+    <footer class="bg-white border-t border-red-200 mt-16 py-8 px-6 text-center text-xs text-zinc-500">
+        <p>&copy; 2026 XENNNSTOREE. All Rights Reserved. Delivered across all 58 Wilayas.</p>
+    </footer>
 
     <script>
         const SUPABASE_URL = "https://oshltauwzurnxaqjlwdz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // USD conversion settings
-        const USD_BLACK_MARKET_RATE = 255;
-        const PROFIT_MARGIN = 1.15; // 15%
+        const EXCHANGE_RATE_DZD = 240; // 1 USD = 240 DZD exchange rate calculation
 
-        // 58 Wilaya Delivery Rates (Home / Stop Desk) extracted from shipping table
+        // 58 Wilaya Delivery Pricing Lookup
         const WILAYA_RATES = {
             "01": { name: "Adrar", home: 1400, desk: 750 },
             "02": { name: "Chlef", home: 600, desk: 400 },
@@ -358,12 +219,36 @@
             "58": { name: "Bordj Baji Mokhtar", home: 1700, desk: 1050 }
         };
 
-        let allProducts = [];
         let calculatedDZD = 0;
         let selectedShippingFee = 0;
 
-        function toggleMenu() {
-            document.getElementById('nav-drawer').classList.toggle('hidden');
+        function initWilayaSelect() {
+            const select = document.getElementById('import-wilaya');
+            select.innerHTML = `<option value="">Select Wilaya</option>` + 
+                Object.keys(WILAYA_RATES).map(code => {
+                    const item = WILAYA_RATES[code];
+                    return `<option value="${code}">${code} - ${item.name}</option>`;
+                }).join('');
+        }
+
+        function calculateTotals() {
+            const usdVal = parseFloat(document.getElementById('import-usd-price').value) || 0;
+            calculatedDZD = Math.round(usdVal * EXCHANGE_RATE_DZD);
+            document.getElementById('summary-dzd-price').textContent = `${calculatedDZD.toLocaleString()} DZD`;
+
+            const wilayaCode = document.getElementById('import-wilaya').value;
+            const deliveryType = document.getElementById('import-delivery-type').value;
+
+            if (wilayaCode && WILAYA_RATES[wilayaCode]) {
+                selectedShippingFee = WILAYA_RATES[wilayaCode][deliveryType] || 0;
+                document.getElementById('summary-shipping-fee').textContent = `${selectedShippingFee.toLocaleString()} DZD`;
+            } else {
+                selectedShippingFee = 0;
+                document.getElementById('summary-shipping-fee').textContent = "Select Wilaya";
+            }
+
+            const grandTotal = calculatedDZD + selectedShippingFee;
+            document.getElementById('summary-grand-total').textContent = `${grandTotal.toLocaleString()} DZD`;
         }
 
         function openImportModal() {
@@ -374,124 +259,6 @@
             document.getElementById('import-modal').classList.add('hidden');
         }
 
-        function initWilayas() {
-            const select = document.getElementById('import-wilaya');
-            select.innerHTML = `<option value="">Select Wilaya</option>` + 
-                Object.keys(WILAYA_RATES).map(code => {
-                    const item = WILAYA_RATES[code];
-                    return `<option value="${code}">${code} - ${item.name}</option>`;
-                }).join('');
-        }
-
-        function updateDeliveryOptions() {
-            calculateTotals();
-        }
-
-        function calculateTotals() {
-            const usdVal = parseFloat(document.getElementById('import-usd-price').value) || 0;
-            const wilayaCode = document.getElementById('import-wilaya').value;
-            const deliveryType = document.getElementById('import-delivery-type').value;
-
-            // Calculate item price
-            if (usdVal <= 0) {
-                calculatedDZD = 0;
-                document.getElementById('import-dzd-preview').innerHTML = `<span>0 DZD</span><span class="text-[10px] text-zinc-400 font-normal">(Rate: 255 + 15%)</span>`;
-            } else {
-                calculatedDZD = Math.round(usdVal * USD_BLACK_MARKET_RATE * PROFIT_MARGIN);
-                document.getElementById('import-dzd-preview').innerHTML = `<span class="text-base">${calculatedDZD.toLocaleString()} DZD</span><span class="text-[10px] text-zinc-500 font-bold">($${usdVal.toFixed(2)} USD)</span>`;
-            }
-
-            // Calculate shipping fee based on Wilaya selection
-            if (wilayaCode && WILAYA_RATES[wilayaCode]) {
-                selectedShippingFee = WILAYA_RATES[wilayaCode][deliveryType] || 0;
-            } else {
-                selectedShippingFee = 0;
-            }
-
-            const grandTotal = calculatedDZD + selectedShippingFee;
-
-            document.getElementById('summary-item-price').textContent = `${calculatedDZD.toLocaleString()} DZD`;
-            document.getElementById('summary-shipping-fee').textContent = `${selectedShippingFee.toLocaleString()} DZD`;
-            document.getElementById('summary-grand-total').textContent = `${grandTotal.toLocaleString()} DZD`;
-        }
-
-        function updateCartBadge() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            document.getElementById('cart-count').textContent = cart.length;
-            document.querySelectorAll('.menu-cart-count').forEach(e => e.textContent = cart.length);
-        }
-
-        async function loadProducts() {
-            const grid = document.getElementById('product-grid');
-            const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: false });
-
-            if (error || !data || data.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-500 font-bold">No active drops available.</div>`;
-                return;
-            }
-
-            allProducts = data;
-            renderProducts(allProducts);
-        }
-
-        function renderProducts(products) {
-            const grid = document.getElementById('product-grid');
-            if (products.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-500 font-bold">No items found in this category.</div>`;
-                return;
-            }
-
-            grid.innerHTML = products.map(p => {
-                const rawImages = p.image_url || p.image || '';
-                const imageList = rawImages.split(',').map(url => url.trim()).filter(Boolean);
-                const displayImage = imageList[0] || 'https://via.placeholder.com/300';
-
-                return `
-                    <div class="y2k-card rounded-2xl overflow-hidden hover:shadow-xl transition flex flex-col justify-between">
-                        <a href="product.html?id=${p.id}">
-                            <div class="h-64 bg-zinc-100 overflow-hidden relative">
-                                <img src="${displayImage}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
-                                <span class="absolute top-3 right-3 bg-red-600 text-white font-black text-xs px-2.5 py-1 rounded uppercase">${p.size}</span>
-                            </div>
-                            <div class="p-4 space-y-2">
-                                <h3 class="font-black text-zinc-950 text-base line-clamp-1">${p.title}</h3>
-                                <p class="text-red-600 font-black text-lg">${p.price} DZD</p>
-                            </div>
-                        </a>
-                        <div class="p-4 pt-0">
-                            <a href="product.html?id=${p.id}" class="block text-center w-full bg-zinc-950 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs uppercase transition">
-                                View Product
-                            </a>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function filterCategory(category) {
-            const titleEl = document.getElementById('catalog-title');
-            const indicatorEl = document.getElementById('filter-active-indicator');
-            const resetBtn = document.getElementById('reset-filter-btn');
-
-            if (category === 'all') {
-                renderProducts(allProducts);
-                titleEl.textContent = 'In-Stock Catalog';
-                indicatorEl.classList.add('hidden');
-                resetBtn.classList.add('hidden');
-            } else {
-                const filtered = allProducts.filter(p => {
-                    const text = (p.title + ' ' + (p.description || '')).toLowerCase();
-                    return text.includes(category.toLowerCase());
-                });
-                renderProducts(filtered);
-                titleEl.textContent = `${category} Catalog`;
-                indicatorEl.classList.remove('hidden');
-                resetBtn.classList.remove('hidden');
-            }
-
-            document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
         async function handleImportOrder(e) {
             e.preventDefault();
             const btn = document.getElementById('import-submit-btn');
@@ -500,10 +267,15 @@
 
             const usdPrice = parseFloat(document.getElementById('import-usd-price').value) || 0;
             const wilayaCode = document.getElementById('import-wilaya').value;
-            const wilayaName = WILAYA_RATES[wilayaCode] ? `${wilayaCode} - ${WILAYA_RATES[wilayaCode].name}` : wilayaCode;
+            const wilayaInfo = WILAYA_RATES[wilayaCode];
+            const wilayaName = wilayaInfo ? `${wilayaCode} - ${wilayaInfo.name}` : wilayaCode;
             const deliveryType = document.getElementById('import-delivery-type').value;
+            const userAddress = document.getElementById('import-address').value;
 
             const grandTotal = calculatedDZD + selectedShippingFee;
+
+            // Formats address with fee info to prevent schema errors
+            const fullAddressInfo = `${userAddress} (${deliveryType === 'home' ? 'Home' : 'Stop Desk'} | Delivery: ${selectedShippingFee} DZD | Grand Total: ${grandTotal} DZD)`;
 
             const order = {
                 product_id: null,
@@ -511,9 +283,8 @@
                 phone_number: document.getElementById('import-phone').value,
                 wilaya: wilayaName,
                 commune: document.getElementById('import-commune').value,
-                address: `${document.getElementById('import-address').value} (${deliveryType === 'home' ? 'Home Delivery' : 'Stop Desk'})`,
-                import_url: document.getElementById('import-url').value + ` | Price: $${usdPrice} USD (${calculatedDZD} DZD) | Delivery: ${selectedShippingFee} DZD | Grand Total: ${grandTotal} DZD`,
-                delivery_fee: selectedShippingFee
+                address: fullAddressInfo,
+                import_url: document.getElementById('import-url').value + ` | Price: $${usdPrice} USD (${calculatedDZD} DZD)`
             };
 
             const { error } = await _supabase.from('orders').insert([order]);
@@ -521,7 +292,7 @@
             if (error) {
                 alert("Failed to submit request: " + error.message);
             } else {
-                alert(`Import request submitted!\nItem Total: ${calculatedDZD.toLocaleString()} DZD\nDelivery Fee: ${selectedShippingFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD\nWe will contact you shortly on your phone number.`);
+                alert(`Import request submitted!\nItem Total: ${calculatedDZD.toLocaleString()} DZD\nDelivery Fee: ${selectedShippingFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD\nWe will contact you shortly!`);
                 document.getElementById('import-order-form').reset();
                 calculateTotals();
                 closeImportModal();
@@ -531,9 +302,48 @@
             btn.textContent = "Submit Import Request";
         }
 
-        initWilayas();
-        loadProducts();
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            document.getElementById('cart-count').textContent = cart.length;
+        }
+
+        async function loadProducts() {
+            const grid = document.getElementById('products-grid');
+            const { data: products, error } = await _supabase.from('products').select('*');
+
+            if (error || !products || products.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-sm text-zinc-500 py-10">No products available at the moment.</p>`;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => {
+                const img = (p.image_url || p.image || '').split(',')[0] || 'https://via.placeholder.com/300';
+                return `
+                    <div class="y2k-card rounded-3xl p-4 border border-red-200 flex flex-col justify-between space-y-4">
+                        <img src="${img}" class="w-full h-56 object-cover rounded-2xl border border-red-100">
+                        <div class="space-y-1">
+                            <h3 class="font-black text-zinc-950 uppercase text-base">${p.title}</h3>
+                            <p class="text-red-600 font-black text-lg">${parseFloat(p.price).toLocaleString()} DZD</p>
+                        </div>
+                        <button onclick='addToCart(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="w-full y2k-btn py-3 rounded-xl text-white font-black uppercase text-xs">
+                            Add To Basket
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addToCart(product) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.push(product);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartBadge();
+            alert(`${product.title} added to your basket!`);
+        }
+
+        initWilayaSelect();
         updateCartBadge();
+        loadProducts();
     </script>
 </body>
 </html>
