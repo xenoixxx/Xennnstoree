@@ -63,7 +63,7 @@
         </div>
     </header>
 
-    <!-- Side Menu Panel Overlay (Opened via Three Stripes) -->
+    <!-- Side Menu Panel Overlay -->
     <div id="side-menu-overlay" onclick="toggleSideMenu()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
 
     <!-- Side Menu Panel Drawer -->
@@ -75,32 +75,35 @@
                 <button onclick="toggleSideMenu()" class="text-zinc-400 hover:text-white font-bold text-xl">✕</button>
             </div>
 
-            <!-- Panel Content: What We Sell (Store Menu) -->
+            <!-- Panel Content: What We Sell (Interactive Categories) -->
             <div class="space-y-4">
-                <div class="flex items-center gap-2 text-xs font-black text-red-500 uppercase tracking-widest">
-                    <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                    <span>What We Sell</span>
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <div class="flex items-center gap-2 text-xs font-black text-red-500 uppercase tracking-widest">
+                        <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                        <span>What We Sell</span>
+                    </div>
+                    <button onclick="filterByCategory('all')" class="text-[10px] text-zinc-400 hover:text-white underline uppercase">Show All</button>
                 </div>
 
                 <div class="space-y-4 text-xs">
                     <!-- Clothing Category -->
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-2">
                         <h4 class="font-black text-white text-sm uppercase border-b border-zinc-800 pb-1 text-red-400">Streetwear Clothing</h4>
-                        <ul class="text-zinc-400 space-y-1 pl-2">
-                            <li>• Oversized Hoodies & Zip-Ups</li>
-                            <li>• Graphic Tees & Vintage Shirts</li>
-                            <li>• Cargo Pants & Baggy Denim</li>
-                            <li>• Tracksuits & Puffer Jackets</li>
+                        <ul class="text-zinc-300 space-y-1.5 font-medium">
+                            <li><button onclick="filterByCategory('shirt')" class="hover:text-red-400 transition flex items-center gap-1.5 w-full text-left">• T-Shirts & Graphic Tees</button></li>
+                            <li><button onclick="filterByCategory('hoodie')" class="hover:text-red-400 transition flex items-center gap-1.5 w-full text-left">• Hoodies & Zip-Ups</button></li>
+                            <li><button onclick="filterByCategory('pants')" class="hover:text-red-400 transition flex items-center gap-1.5 w-full text-left">• Cargo Pants & Jeans</button></li>
+                            <li><button onclick="filterByCategory('jacket')" class="hover:text-red-400 transition flex items-center gap-1.5 w-full text-left">• Tracksuits & Jackets</button></li>
                         </ul>
                     </div>
 
                     <!-- Accessories Category -->
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-2">
                         <h4 class="font-black text-white text-sm uppercase border-b border-zinc-800 pb-1 text-red-400">Accessories</h4>
-                        <ul class="text-zinc-400 space-y-1 pl-2">
-                            <li>• Beanies, Caps & Balaclavas</li>
-                            <li>• Chains, Rings & Streetwear Jewelry</li>
-                            <li>• Crossbody Bags, Backpacks & Belts</li>
+                        <ul class="text-zinc-300 space-y-1.5 font-medium">
+                            <li><button onclick="filterByCategory('beanie')" class="hover:text-red-400 transition flex items-center gap-1.5 w-full text-left">• Beanies, Caps & Headwear</button></li>
+                            <li><button onclick="filterByCategory('chain')" class="hover:text-red-400 transition flex items-center gap-1.5 w-full text-left">• Jewelry & Chains</button></li>
+                            <li><button onclick="filterByCategory('bag')" class="hover:text-red-400 transition flex items-center gap-1.5 w-full text-left">• Bags, Packs & Accessories</button></li>
                         </ul>
                     </div>
                 </div>
@@ -111,12 +114,12 @@
         <div class="p-6 bg-zinc-900 border-t border-zinc-800 space-y-3">
             <div class="bg-red-950/40 border border-red-800/50 rounded-xl p-3">
                 <div class="flex items-center gap-1.5 text-xs font-black text-red-400 uppercase">
-                    <span>⚡ Import Anything You Want</span>
+                    <span>⚡ Custom Import Request</span>
                 </div>
                 <p class="text-[11px] text-zinc-400 mt-1 leading-relaxed">
-                    Have a specific item from abroad? Send us any product link and we will import it directly for you.
+                    Have a specific item from abroad? Send us any product link and we will import it for you.
                 </p>
-                <p class="text-[10px] font-bold text-red-400 mt-1">Fixed Rate: 260 DZD / 1 USD</p>
+                <p class="text-[10px] font-bold text-red-400 mt-1">Rate: 260 DZD/USD + 9% Fee</p>
             </div>
 
             <button onclick="toggleSideMenu(); openImportModal();" class="w-full y2k-btn py-3 rounded-xl text-white font-black uppercase tracking-wider text-xs shadow-md">
@@ -140,10 +143,10 @@
             <input type="text" id="search-input-mobile" onkeyup="filterProductsMobile()" placeholder="Search streetwear drops..." class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-red-500">
         </div>
 
-        <!-- Products Grid -->
-        <section>
+        <!-- Products Grid Section -->
+        <section id="catalog-section">
             <div class="flex justify-between items-center mb-6 border-b border-red-200 pb-2">
-                <h2 class="text-2xl font-black uppercase text-zinc-950">Available Products</h2>
+                <h2 id="catalog-title" class="text-2xl font-black uppercase text-zinc-950">Available Products</h2>
                 <span id="product-count" class="text-xs font-bold text-zinc-500 uppercase">0 Items</span>
             </div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -187,10 +190,10 @@
                     </div>
                 </div>
 
-                <!-- Live Price Breakdown Box (Fixed @ 260 DZD/USD) -->
+                <!-- Live Price Breakdown Box (260 DZD/USD + 9% Margin) -->
                 <div class="bg-red-50 border border-red-200 rounded-2xl p-4 space-y-2 text-xs">
                     <div class="flex justify-between text-zinc-600">
-                        <span>Converted Item Price (260 DZD/USD):</span>
+                        <span>Converted Item Price (260 DZD/USD + 9% Profit):</span>
                         <span id="summary-dzd-price" class="font-bold text-zinc-950">0 DZD</span>
                     </div>
                     <div class="flex justify-between text-zinc-600">
@@ -239,8 +242,10 @@
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Fixed exchange rate set strictly to 260 DZD per 1 USD
-        const EXCHANGE_RATE_DZD = 260; 
+        // Fixed exchange rate (260 DZD/USD) + 9% profit margin
+        const BASE_RATE = 260;
+        const PROFIT_MARGIN = 1.09; // 9% Profit Added
+        const EFFECTIVE_RATE = BASE_RATE * PROFIT_MARGIN; // 283.4 DZD per USD
 
         // 58 Wilaya Delivery Pricing Lookup
         const WILAYA_RATES = {
@@ -323,6 +328,24 @@
             }
         }
 
+        // Category Filter function linked to drawer items
+        function filterByCategory(keyword) {
+            toggleSideMenu(); // Close side panel
+            
+            const titleEl = document.getElementById('catalog-title');
+            if (keyword === 'all') {
+                titleEl.textContent = 'Available Products';
+                renderProducts(loadedProductsList);
+            } else {
+                titleEl.textContent = `Filtered: ${keyword.toUpperCase()}S`;
+                const filtered = loadedProductsList.filter(p => p.title.toLowerCase().includes(keyword.toLowerCase()));
+                renderProducts(filtered);
+            }
+
+            // Smooth scroll to product grid
+            document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
         function initWilayaSelect() {
             const select = document.getElementById('import-wilaya');
             select.innerHTML = `<option value="">Select Wilaya</option>` + 
@@ -334,7 +357,9 @@
 
         function calculateTotals() {
             const usdVal = parseFloat(document.getElementById('import-usd-price').value) || 0;
-            calculatedDZD = Math.round(usdVal * EXCHANGE_RATE_DZD);
+            
+            // Item converted value + 9% profit margin applied
+            calculatedDZD = Math.round(usdVal * EFFECTIVE_RATE);
             document.getElementById('summary-dzd-price').textContent = `${calculatedDZD.toLocaleString()} DZD`;
 
             const wilayaCode = document.getElementById('import-wilaya').value;
@@ -384,7 +409,7 @@
                 wilaya: wilayaName,
                 commune: document.getElementById('import-commune').value,
                 address: fullAddressInfo,
-                import_url: document.getElementById('import-url').value + ` | Price: $${usdPrice} USD (${calculatedDZD} DZD @ 260 rate)`
+                import_url: document.getElementById('import-url').value + ` | Price: $${usdPrice} USD (${calculatedDZD} DZD incl. 9% margin)`
             };
 
             const { error } = await _supabase.from('orders').insert([order]);
@@ -392,7 +417,7 @@
             if (error) {
                 alert("Failed to submit request: " + error.message);
             } else {
-                alert(`Import request submitted!\nItem Total: ${calculatedDZD.toLocaleString()} DZD\nDelivery Fee: ${selectedShippingFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD\nWe will contact you shortly!`);
+                alert(`Import request submitted!\nItem Total (with 9% profit): ${calculatedDZD.toLocaleString()} DZD\nDelivery Fee: ${selectedShippingFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD\nWe will contact you shortly!`);
                 document.getElementById('import-order-form').reset();
                 calculateTotals();
                 closeImportModal();
@@ -426,7 +451,7 @@
             document.getElementById('product-count').textContent = `${list.length} Items`;
 
             if (list.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-sm text-zinc-500 py-10">No items match your search query.</p>`;
+                grid.innerHTML = `<p class="col-span-full text-center text-sm text-zinc-500 py-10">No items match your query.</p>`;
                 return;
             }
 
