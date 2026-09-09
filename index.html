@@ -32,73 +32,29 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-    <!-- Classic Three-Stripes Accent Bar with Embedded Import Option & Offerings Menu -->
-    <div class="w-full bg-zinc-950 text-white sticky top-0 z-50 border-b border-red-600/30">
-        <!-- The 3 Color Stripes -->
-        <div class="w-full grid grid-cols-3 h-1.5">
-            <div class="bg-red-600"></div>
-            <div class="bg-zinc-950"></div>
-            <div class="bg-red-500"></div>
-        </div>
-
-        <!-- Inner Three-Stripes Interactive Utility Bar -->
-        <div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs font-bold uppercase tracking-wider">
-            <!-- Left Stripe Item: Offerings & Catalog Scope -->
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                <span class="text-zinc-300">We Import & Sell:</span>
-                <div class="relative group inline-block">
-                    <button class="bg-zinc-800 text-red-400 px-2.5 py-1 rounded-md border border-zinc-700 hover:border-red-500 transition flex items-center gap-1">
-                        <span>Clothing & Accessories Catalog</span>
-                        <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                    </button>
-                    <!-- Hover Menu: What Types of Items We Import & Sell -->
-                    <div class="absolute left-0 mt-1 w-64 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl p-3 hidden group-hover:block z-50 text-[11px] normal-case text-zinc-300 space-y-2">
-                        <p class="font-bold text-red-400 uppercase tracking-wider border-b border-zinc-800 pb-1">Clothing Items</p>
-                        <ul class="list-disc pl-4 space-y-0.5">
-                            <li>Oversized Hoodies & Zip-Ups</li>
-                            <li>Graphic Tees & Y2K Shirts</li>
-                            <li>Cargo Pants & Baggy Denim</li>
-                            <li>Tracksuits & Outerwear Jackets</li>
-                        </ul>
-                        <p class="font-bold text-red-400 uppercase tracking-wider border-b border-zinc-800 pb-1 pt-1">Accessories</p>
-                        <ul class="list-disc pl-4 space-y-0.5">
-                            <li>Beanies, Caps & Balaclavas</li>
-                            <li>Chains, Rings & Streetwear Jewelry</li>
-                            <li>Bags, Crossbody Packs & Belts</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Middle Stripe Item: Fixed Rate Notice -->
-            <div class="hidden lg:flex items-center gap-1 text-zinc-400 text-[11px]">
-                <span>Fixed Import Rate:</span>
-                <span class="text-white font-black bg-red-600/30 px-1.5 py-0.5 rounded border border-red-500/40">260 DZD / USD</span>
-            </div>
-
-            <!-- Right Stripe Item: Import Request Trigger -->
-            <div>
-                <button onclick="openImportModal()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md transition shadow flex items-center gap-1">
-                    <span>+ Custom Import Request</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Header Navigation Bar -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-red-200 px-6 py-4 sticky top-[38px] z-40 flex justify-between items-center shadow-sm">
-        <a href="index.html" class="flex items-center gap-2">
-            <span class="text-2xl font-black tracking-tight text-zinc-950">XENNN<span class="text-red-600">STOREE</span></span>
-            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded uppercase border border-red-300">DZ</span>
-        </a>
+    <header class="bg-white/95 backdrop-blur-md border-b border-red-200 px-6 py-4 sticky top-0 z-40 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-4">
+            <!-- Three Stripes Menu Button -->
+            <button onclick="toggleSideMenu()" class="p-2 text-zinc-950 hover:text-red-600 focus:outline-none transition">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
 
-        <!-- Search Bar -->
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-2">
+                <span class="text-2xl font-black tracking-tight text-zinc-950">XENNN<span class="text-red-600">STOREE</span></span>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded uppercase border border-red-300">DZ</span>
+            </a>
+        </div>
+
+        <!-- Search Bar Desktop -->
         <div class="hidden md:flex items-center max-w-sm w-full mx-4">
             <input type="text" id="search-input" onkeyup="filterProducts()" placeholder="Search streetwear drops..." class="w-full bg-zinc-50 border border-red-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-red-500">
         </div>
 
-        <!-- Navigation Actions -->
+        <!-- Right Side Cart Action -->
         <div class="flex items-center gap-3">
             <a href="cart.html" class="relative text-xs font-bold text-zinc-950 uppercase hover:text-red-600 transition flex items-center gap-1 bg-zinc-100 border border-zinc-200 px-3 py-2 rounded-xl">
                 <span>Basket</span>
@@ -106,6 +62,68 @@
             </a>
         </div>
     </header>
+
+    <!-- Side Menu Panel Overlay (Opened via Three Stripes) -->
+    <div id="side-menu-overlay" onclick="toggleSideMenu()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Side Menu Panel Drawer -->
+    <aside id="side-menu-drawer" class="fixed top-0 left-0 w-80 max-w-[85vw] h-full bg-zinc-950 text-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between border-r border-red-600/30 shadow-2xl overflow-y-auto">
+        <div class="p-6 space-y-6">
+            <!-- Drawer Header -->
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+                <span class="text-xl font-black tracking-tight text-white">XENNN<span class="text-red-500">STOREE</span></span>
+                <button onclick="toggleSideMenu()" class="text-zinc-400 hover:text-white font-bold text-xl">✕</button>
+            </div>
+
+            <!-- Panel Content: What We Sell (Store Menu) -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 text-xs font-black text-red-500 uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                    <span>What We Sell</span>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <!-- Clothing Category -->
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-2">
+                        <h4 class="font-black text-white text-sm uppercase border-b border-zinc-800 pb-1 text-red-400">Streetwear Clothing</h4>
+                        <ul class="text-zinc-400 space-y-1 pl-2">
+                            <li>• Oversized Hoodies & Zip-Ups</li>
+                            <li>• Graphic Tees & Vintage Shirts</li>
+                            <li>• Cargo Pants & Baggy Denim</li>
+                            <li>• Tracksuits & Puffer Jackets</li>
+                        </ul>
+                    </div>
+
+                    <!-- Accessories Category -->
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-2">
+                        <h4 class="font-black text-white text-sm uppercase border-b border-zinc-800 pb-1 text-red-400">Accessories</h4>
+                        <ul class="text-zinc-400 space-y-1 pl-2">
+                            <li>• Beanies, Caps & Balaclavas</li>
+                            <li>• Chains, Rings & Streetwear Jewelry</li>
+                            <li>• Crossbody Bags, Backpacks & Belts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Bottom: Custom Import Request Block -->
+        <div class="p-6 bg-zinc-900 border-t border-zinc-800 space-y-3">
+            <div class="bg-red-950/40 border border-red-800/50 rounded-xl p-3">
+                <div class="flex items-center gap-1.5 text-xs font-black text-red-400 uppercase">
+                    <span>⚡ Import Anything You Want</span>
+                </div>
+                <p class="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+                    Have a specific item from abroad? Send us any product link and we will import it directly for you.
+                </p>
+                <p class="text-[10px] font-bold text-red-400 mt-1">Fixed Rate: 260 DZD / 1 USD</p>
+            </div>
+
+            <button onclick="toggleSideMenu(); openImportModal();" class="w-full y2k-btn py-3 rounded-xl text-white font-black uppercase tracking-wider text-xs shadow-md">
+                + Custom Import Request
+            </button>
+        </div>
+    </aside>
 
     <!-- Main Store Content -->
     <main class="max-w-6xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
@@ -289,6 +307,21 @@
         let loadedProductsList = [];
         let calculatedDZD = 0;
         let selectedShippingFee = 0;
+
+        function toggleSideMenu() {
+            const overlay = document.getElementById('side-menu-overlay');
+            const drawer = document.getElementById('side-menu-drawer');
+
+            if (drawer.classList.contains('-translate-x-full')) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                drawer.classList.remove('-translate-x-full');
+            } else {
+                overlay.classList.add('opacity-0');
+                drawer.classList.add('-translate-x-full');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
 
         function initWilayaSelect() {
             const select = document.getElementById('import-wilaya');
