@@ -405,7 +405,8 @@
 
         async function sendToEcoTrack(orderDetails) {
             try {
-                const { data, error } = await _supabase.functions.invoke('sync-ecotrack', {
+                // Targets the deployed function slug: 'swift-processor'
+                const { data, error } = await _supabase.functions.invoke('swift-processor', {
                     body: orderDetails
                 });
 
