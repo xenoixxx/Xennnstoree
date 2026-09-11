@@ -76,7 +76,7 @@
                 <form id="checkout-form" onsubmit="handleCheckout(event)" class="space-y-4 pt-2">
                     <div>
                         <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Full Name *</label>
-                        <input type="text" id="cust-name" required placeholder="e.g. Amine Batata" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                        <input type="text" id="cust-name" required placeholder="e.g. John Doe" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
                     </div>
 
                     <div>
@@ -106,12 +106,12 @@
 
                     <div>
                         <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Commune *</label>
-                        <input type="text" id="cust-commune" required placeholder="e.g. Mahelma" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                        <input type="text" id="cust-commune" required placeholder="e.g. Alger Centre" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Street Address *</label>
-                        <input type="text" id="cust-address" required placeholder="e.g. AADL 1256 Mahelma" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                        <input type="text" id="cust-address" required placeholder="e.g. Didouche Mourad Street N° 12" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
                     </div>
 
                     <button type="submit" id="submit-btn" class="w-full y2k-btn py-3.5 rounded-xl text-white font-black uppercase tracking-wider text-xs shadow-md">
@@ -303,16 +303,16 @@
                             let addressParts = [road, commune].filter(Boolean);
                             let fullStreet = addressParts.join(', ');
                             if (fullStreet) {
-                                document.getElementById('cust-address').value = `${fullStreet} (GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)})`;
+                                document.getElementById('cust-address').value = `${fullStreet}`;
                             } else {
-                                document.getElementById('cust-address').value = `GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                                document.getElementById('cust-address').value = `GPS Location (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
                             }
                         } else {
-                            document.getElementById('cust-address').value = `GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                            document.getElementById('cust-address').value = `GPS Location (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
                         }
                     } catch (e) {
                         console.error("Geocoding failed:", e);
-                        document.getElementById('cust-address').value = `GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                        document.getElementById('cust-address').value = `GPS Location (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
                     } finally {
                         btn.disabled = false;
                         btn.innerHTML = originalText;
@@ -410,7 +410,7 @@
         async function sendToEcoTrack(orderDetails) {
             const targetUrl = `${ECOTRACK_BASE_URL}/api/v1/parcels`;
             
-            // Open, free CORS proxy without API key restrictions
+            // Open CORS proxy for API authorization
             const corsProxy = "https://api.allorigins.win/raw?url=";
             const endpoint = corsProxy + encodeURIComponent(targetUrl);
 
