@@ -127,7 +127,7 @@
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // EcoTrack Configuration using your API Token and platform host
+        // EcoTrack Configuration
         const ECOTRACK_BASE_URL = "https://48hr.ecotrack.dz";
         const ECOTRACK_API_TOKEN = "UqWSgcZOTKd7O2EfKImkRZp7lbVXiXJArWyE7zxWo2SDtWP0rcGGrzhAnvHs";
 
@@ -408,7 +408,7 @@
         }
 
         async function sendToEcoTrack(orderDetails) {
-            const endpoint = `${ECOTRACK_BASE_URL}/api/v1/parcels/create`;
+            const endpoint = `${ECOTRACK_BASE_URL}/api/v1/parcels`;
 
             const payload = {
                 nom_client: orderDetails.clientName,
@@ -424,7 +424,7 @@
             };
 
             try {
-                const response = await fetch(endpoint, {
+                let response = await fetch(endpoint, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -434,9 +434,21 @@
                     body: JSON.stringify(payload)
                 });
 
+                if (response.status === 404) {
+                    response = await fetch(`${ECOTRACK_BASE_URL}/api/v1/command`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${ECOTRACK_API_TOKEN}`,
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                }
+
                 const data = await response.json();
 
-                if (response.ok && (data.status === 200 || data.success || data.tracking || data.id)) {
+                if (response.ok && (data.status === 200 || data.status === 201 || data.success || data.tracking || data.id)) {
                     return { success: true, tracking: data.tracking || data.id };
                 } else {
                     return { success: false, error: data.message || JSON.stringify(data) };
