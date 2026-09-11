@@ -127,6 +127,10 @@
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // EcoTrack Configuration using your API Token and platform host
+        const ECOTRACK_BASE_URL = "https://48hr.ecotrack.dz";
+        const ECOTRACK_API_TOKEN = "UqWSgcZOTKd7O2EfKImkRZp7lbVXiXJArWyE7zxWo2SDtWP0rcGGrzhAnvHs";
+
         // 58 Wilaya Delivery Rates (Home / Desk)
         const WILAYA_RATES = {
             "01": { name: "Adrar", home: 1400, desk: 750 },
@@ -223,7 +227,6 @@
             listEl.innerHTML = currentCart.map((item, index) => {
                 const itemPrice = parseFloat(item.price) || 0;
                 itemsSubtotal += itemPrice;
-
                 const displayImg = (item.image_url || item.image || '').split(',')[0] || 'https://via.placeholder.com/150';
 
                 return `
@@ -287,7 +290,6 @@
                     const lon = position.coords.longitude;
 
                     try {
-                        // Reverse geocoding via OpenStreetMap Nominatim
                         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
                         const data = await res.json();
 
@@ -298,7 +300,6 @@
                             
                             if (commune) document.getElementById('cust-commune').value = commune;
                             
-                            // Construct address string
                             let addressParts = [road, commune].filter(Boolean);
                             let fullStreet = addressParts.join(', ');
                             if (fullStreet) {
@@ -336,40 +337,101 @@
 
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
-            btn.textContent = "PROCESSING ORDER...";
+            btn.textContent = "PROCESSING ORDER & DISPATCHING...";
 
             const wilayaCode = document.getElementById('cust-wilaya').value;
             const wilayaInfo = WILAYA_RATES[wilayaCode];
-            const wilayaName = wilayaInfo ? `${wilayaCode} - ${wilayaInfo.name}` : wilayaCode;
+            const wilayaName = wilayaInfo ? wilayaInfo.name : wilayaCode;
             const deliveryType = document.getElementById('cust-delivery-type').value;
             const userAddress = document.getElementById('cust-address').value;
+            const customerName = document.getElementById('cust-name').value;
+            const customerPhone = document.getElementById('cust-phone').value;
+            const customerCommune = document.getElementById('cust-commune').value;
             
             const grandTotal = itemsSubtotal + activeDeliveryFee;
-            
-            // Embed delivery fee into the address string so it avoids missing schema columns error
             const fullAddressInfo = `${userAddress} (${deliveryType === 'home' ? 'Home' : 'Stop Desk'} | Delivery: ${activeDeliveryFee} DZD | Grand Total: ${grandTotal} DZD)`;
+            const productListText = currentCart.map(i => `${i.title} (${i.size || 'Standard'})`).join(', ');
 
             try {
+                // 1. Save to Supabase
                 for (const item of currentCart) {
                     const { error } = await _supabase.from('orders').insert([{
                         product_id: item.id || null,
-                        customer_name: document.getElementById('cust-name').value,
-                        phone_number: document.getElementById('cust-phone').value,
-                        wilaya: wilayaName,
-                        commune: document.getElementById('cust-commune').value,
+                        customer_name: customerName,
+                        phone_number: customerPhone,
+                        wilaya: `${wilayaCode} - ${wilayaName}`,
+                        commune: customerCommune,
                         address: fullAddressInfo
                     }]);
 
                     if (error) throw error;
                 }
 
-                alert(`Order placed successfully!\nSubtotal: ${itemsSubtotal.toLocaleString()} DZD\nDelivery: ${activeDeliveryFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD`);
+                // 2. Automatically Dispatch to EcoTrack API
+                const ecoTrackResult = await sendToEcoTrack({
+                    clientName: customerName,
+                    clientPhone: customerPhone,
+                    codeWilaya: parseInt(wilayaCode, 10),
+                    wilaya: wilayaName,
+                    commune: customerCommune,
+                    address: userAddress,
+                    deliveryType: deliveryType,
+                    totalPrice: grandTotal,
+                    products: productListText
+                });
+
+                if (ecoTrackResult.success) {
+                    alert(`Order placed and synced to EcoTrack successfully!`);
+                } else {
+                    alert(`Order saved to database! (EcoTrack sync note: ${ecoTrackResult.error || 'Check dashboard for status'})`);
+                }
+
                 localStorage.removeItem('cart');
                 window.location.href = "index.html";
             } catch (err) {
                 alert("Error placing order: " + err.message);
                 btn.disabled = false;
                 btn.textContent = "Confirm Order";
+            }
+        }
+
+        async function sendToEcoTrack(orderDetails) {
+            const endpoint = `${ECOTRACK_BASE_URL}/api/v1/parcels/create`;
+
+            const payload = {
+                nom_client: orderDetails.clientName,
+                telephone: orderDetails.clientPhone,
+                code_wilaya: orderDetails.codeWilaya,
+                wilaya: orderDetails.wilaya,
+                commune: orderDetails.commune,
+                adresse: orderDetails.address,
+                montant: orderDetails.totalPrice,
+                produit: orderDetails.products,
+                stop_desk: orderDetails.deliveryType === 'desk' ? 1 : 0,
+                livraison_gratuite: 0
+            };
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${ECOTRACK_API_TOKEN}`,
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && (data.status === 200 || data.success || data.tracking || data.id)) {
+                    return { success: true, tracking: data.tracking || data.id };
+                } else {
+                    return { success: false, error: data.message || JSON.stringify(data) };
+                }
+            } catch (err) {
+                console.error("EcoTrack API connection error:", err);
+                return { success: false, error: err.message };
             }
         }
 
