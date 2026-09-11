@@ -353,17 +353,29 @@
             const productListText = currentCart.map(i => `${i.title} (${i.size || 'Standard'})`).join(', ');
 
             try {
-                // 1. Save to Supabase
+                // Fetch valid product IDs from database to safely validate existing IDs vs test items
+                const { data: dbProducts } = await _supabase.from('products').select('id');
+                const validProductIds = new Set((dbProducts || []).map(p => String(p.id)));
+
+                // 1. Insert into Supabase
                 for (const item of currentCart) {
-                    const { error } = await _supabase.from('orders').insert([{
-                        product_id: item.id || null,
+                    const rawId = item.id ? String(item.id) : null;
+                    const validProductId = (rawId && validProductIds.has(rawId)) ? item.id : null;
+
+                    const orderPayload = {
                         customer_name: customerName,
                         phone_number: customerPhone,
                         wilaya: `${wilayaCode} - ${wilayaName}`,
                         commune: customerCommune,
                         address: fullAddressInfo
-                    }]);
+                    };
 
+                    // Send product_id only if valid to avoid foreign key errors
+                    if (validProductId !== null) {
+                        orderPayload.product_id = validProductId;
+                    }
+
+                    const { error } = await _supabase.from('orders').insert([orderPayload]);
                     if (error) throw error;
                 }
 
@@ -383,7 +395,7 @@
                 if (ecoTrackResult.success) {
                     alert(`Order placed and synced to EcoTrack successfully!`);
                 } else {
-                    alert(`Order saved to database! (EcoTrack sync note: ${ecoTrackResult.error || 'Check dashboard for status'})`);
+                    alert(`Order saved to database! (EcoTrack sync note: ${ecoTrackResult.error || 'Check dashboard'})`);
                 }
 
                 localStorage.removeItem('cart');
