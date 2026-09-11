@@ -127,10 +127,6 @@
         const SUPABASE_KEY = "sb_publishable_-WBcVndQ2JVR55yt6QfhFg_k1XB5ANd";
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // EcoTrack Configuration
-        const ECOTRACK_BASE_URL = "https://48hr.ecotrack.dz";
-        const ECOTRACK_API_TOKEN = "UqWSgcZOTKd7O2EfKImkRZp7lbVXiXJArWyE7zxWo2SDtWP0rcGGrzhAnvHs";
-
         // 58 Wilaya Delivery Rates (Home / Desk)
         const WILAYA_RATES = {
             "01": { name: "Adrar", home: 1400, desk: 750 },
@@ -357,7 +353,7 @@
                 const { data: dbProducts } = await _supabase.from('products').select('id');
                 const validProductIds = new Set((dbProducts || []).map(p => String(p.id)));
 
-                // 1. Insert into Supabase
+                // 1. Insert into Supabase Orders Table
                 for (const item of currentCart) {
                     const rawId = item.id ? String(item.id) : null;
                     const validProductId = (rawId && validProductIds.has(rawId)) ? item.id : null;
@@ -379,7 +375,7 @@
                     if (error) throw error;
                 }
 
-                // 2. Automatically Dispatch to EcoTrack API
+                // 2. Dispatch to EcoTrack via Supabase Edge Function
                 const ecoTrackResult = await sendToEcoTrack({
                     clientName: customerName,
                     clientPhone: customerPhone,
@@ -408,47 +404,23 @@
         }
 
         async function sendToEcoTrack(orderDetails) {
-            const targetUrl = `${ECOTRACK_BASE_URL}/api/v1/parcels`;
-            
-            // Open CORS proxy for API authorization
-            const corsProxy = "https://api.allorigins.win/raw?url=";
-            const endpoint = corsProxy + encodeURIComponent(targetUrl);
-
-            const payload = {
-                valid: 1,
-                nom_client: orderDetails.clientName,
-                telephone: orderDetails.clientPhone,
-                code_wilaya: orderDetails.codeWilaya,
-                wilaya: orderDetails.wilaya,
-                commune: orderDetails.commune,
-                adresse: orderDetails.address,
-                montant: orderDetails.totalPrice,
-                produit: orderDetails.products,
-                type: orderDetails.deliveryType === 'desk' ? 2 : 1,
-                stop_desk: orderDetails.deliveryType === 'desk' ? 1 : 0,
-                livraison_gratuite: 0
-            };
-
             try {
-                let response = await fetch(endpoint, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${ECOTRACK_API_TOKEN}`,
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify(payload)
+                const { data, error } = await _supabase.functions.invoke('sync-ecotrack', {
+                    body: orderDetails
                 });
 
-                const data = await response.json();
+                if (error) {
+                    console.error("Supabase Edge Function error:", error);
+                    return { success: false, error: error.message };
+                }
 
-                if (response.ok && (data.status === 200 || data.status === 201 || data.success || data.tracking || data.id)) {
+                if (data && (data.status === 200 || data.status === 201 || data.success || data.tracking || data.id)) {
                     return { success: true, tracking: data.tracking || data.id };
                 } else {
-                    return { success: false, error: data.message || JSON.stringify(data) };
+                    return { success: false, error: data?.message || JSON.stringify(data) };
                 }
             } catch (err) {
-                console.error("EcoTrack API connection error:", err);
+                console.error("EcoTrack connection error:", err);
                 return { success: false, error: err.message };
             }
         }
