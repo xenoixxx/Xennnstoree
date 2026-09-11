@@ -408,8 +408,12 @@
         }
 
         async function sendToEcoTrack(orderDetails) {
-            // Updated to the correct EcoTrack REST creation route
-            const endpoint = `${ECOTRACK_BASE_URL}/api/v1/create`;
+            // Updated to the official EcoTrack REST route
+            const targetUrl = `${ECOTRACK_BASE_URL}/api/v1/parcels`;
+            
+            // Bypass GitHub Pages CORS blocking
+            const corsProxy = "https://corsproxy.io/?";
+            const endpoint = corsProxy + encodeURIComponent(targetUrl);
 
             const payload = {
                 valid: 1,
