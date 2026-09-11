@@ -408,9 +408,11 @@
         }
 
         async function sendToEcoTrack(orderDetails) {
-            const endpoint = `${ECOTRACK_BASE_URL}/api/v1/parcels`;
+            // Updated to the correct EcoTrack REST creation route
+            const endpoint = `${ECOTRACK_BASE_URL}/api/v1/create`;
 
             const payload = {
+                valid: 1,
                 nom_client: orderDetails.clientName,
                 telephone: orderDetails.clientPhone,
                 code_wilaya: orderDetails.codeWilaya,
@@ -419,6 +421,7 @@
                 adresse: orderDetails.address,
                 montant: orderDetails.totalPrice,
                 produit: orderDetails.products,
+                type: orderDetails.deliveryType === 'desk' ? 2 : 1,
                 stop_desk: orderDetails.deliveryType === 'desk' ? 1 : 0,
                 livraison_gratuite: 0
             };
@@ -433,18 +436,6 @@
                     },
                     body: JSON.stringify(payload)
                 });
-
-                if (response.status === 404) {
-                    response = await fetch(`${ECOTRACK_BASE_URL}/api/v1/command`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${ECOTRACK_API_TOKEN}`,
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify(payload)
-                    });
-                }
 
                 const data = await response.json();
 
