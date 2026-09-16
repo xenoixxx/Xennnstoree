@@ -263,6 +263,20 @@
                 .trim();
         }
 
+        function formatEcoTrackCommune(str) {
+            if (!str) return "";
+            return str
+                .trim()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/['’]/g, " ")
+                .replace(/\s+/g, " ")
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
         function initWilayaSelect() {
             const select = document.getElementById('cust-wilaya');
             select.innerHTML = `<option value="">Select Wilaya</option>` + 
@@ -396,130 +410,85 @@
                             let addressParts = [road, rawDetectedCommune].filter(Boolean);
                             let fullStreet = addressParts.join(', ');
                             if (fullStreet) {
-                                document.getElementById('cust-address').value = `${fullStreet}`;
-                            } else {
-                                document.getElementById('cust-address').value = `GPS Location (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
+                                document.getElementById('cust-address').value = fullStreet;
                             }
-                        } else {
-                            document.getElementById('cust-address').value = `GPS Location (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
                         }
-                    } catch (e) {
-                        console.error("Geocoding failed:", e);
-                        document.getElementById('cust-address').value = `GPS Location (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
+                    } catch (err) {
+                        console.error("Geolocation fetch error:", err);
                     } finally {
                         btn.disabled = false;
                         btn.innerHTML = originalText;
                     }
                 },
-                (error) => {
-                    alert("Unable to retrieve location. Please check browser permissions or enter address manually.");
+                (err) => {
+                    alert("Unable to retrieve location. Please grant location permissions.");
                     btn.disabled = false;
                     btn.innerHTML = originalText;
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                }
             );
         }
 
-        async function handleCheckout(e) {
-            e.preventDefault();
+        async function handleCheckout(event) {
+            event.preventDefault();
 
-            if (currentCart.length === 0) {
-                alert("Your basket is empty.");
-                return;
-            }
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing...";
 
-            const btn = document.getElementById('submit-btn');
-            btn.disabled = true;
-            btn.textContent = "PROCESSING ORDER & DISPATCHING...";
-
-            const wilayaCode = document.getElementById('cust-wilaya').value;
-            const wilayaInfo = WILAYA_RATES[wilayaCode];
-            const wilayaName = wilayaInfo ? wilayaInfo.name : wilayaCode;
+            const clientName = document.getElementById('cust-name').value;
+            const clientPhone = document.getElementById('cust-phone').value;
+            const rawWilaya = document.getElementById('cust-wilaya').value;
+            const rawCommune = document.getElementById('cust-commune').value;
+            const address = document.getElementById('cust-address').value;
             const deliveryType = document.getElementById('cust-delivery-type').value;
-            const userAddress = document.getElementById('cust-address').value;
-            const customerName = document.getElementById('cust-name').value;
-            const customerPhone = document.getElementById('cust-phone').value;
-            const customerCommune = document.getElementById('cust-commune').value;
-            
-            const grandTotal = itemsSubtotal + activeDeliveryFee;
-            const fullAddressInfo = `${userAddress} (${deliveryType === 'home' ? 'Home' : 'Stop Desk'} | Delivery: ${activeDeliveryFee} DZD | Grand Total: ${grandTotal} DZD)`;
-            const productListText = currentCart.map(i => `${i.title} (${i.size || 'Standard'})`).join(', ');
+
+            const codeWilaya = parseInt(rawWilaya, 10);
+            const sanitizedCommune = formatEcoTrackCommune(rawCommune);
+            const totalPrice = itemsSubtotal + activeDeliveryFee;
+
+            const payload = {
+                clientName: clientName,
+                clientPhone: clientPhone,
+                codeWilaya: codeWilaya,
+                commune: sanitizedCommune,
+                address: address,
+                deliveryType: deliveryType,
+                totalPrice: totalPrice,
+                products: currentCart.map(item => `${item.title} (${item.size || 'Standard'})`).join(', ') || "Order from XENNNSTOREE"
+            };
 
             try {
-                const { data: dbProducts } = await _supabase.from('products').select('id');
-                const validProductIds = new Set((dbProducts || []).map(p => String(p.id)));
-
-                for (const item of currentCart) {
-                    const rawId = item.id ? String(item.id) : null;
-                    const validProductId = (rawId && validProductIds.has(rawId)) ? item.id : null;
-
-                    const orderPayload = {
-                        customer_name: customerName,
-                        phone_number: customerPhone,
-                        wilaya: `${wilayaCode} - ${wilayaName}`,
-                        commune: customerCommune,
-                        address: fullAddressInfo
-                    };
-
-                    if (validProductId !== null) {
-                        orderPayload.product_id = validProductId;
-                    }
-
-                    const { error } = await _supabase.from('orders').insert([orderPayload]);
-                    if (error) throw error;
-                }
-
-                const ecoTrackResult = await sendToEcoTrack({
-                    clientName: customerName,
-                    clientPhone: customerPhone,
-                    codeWilaya: parseInt(wilayaCode, 10),
-                    wilaya: wilayaName,
-                    commune: customerCommune,
-                    address: userAddress,
-                    deliveryType: deliveryType,
-                    totalPrice: grandTotal,
-                    products: productListText
+                const response = await fetch("https://oshltauwzurnxaqjlwdz.supabase.co/functions/v1/swift-processor", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
                 });
 
-                if (ecoTrackResult.success) {
-                    alert(`Order placed and synced to EcoTrack successfully!`);
-                } else {
-                    alert(`Order saved to database! (EcoTrack sync note: ${ecoTrackResult.error || 'Check dashboard'})`);
-                }
+                const result = await response.json();
 
-                localStorage.removeItem('cart');
-                window.location.href = "index.html";
+                if (result.success || (result.ecoTrackResponse && result.ecoTrackResponse.success)) {
+                    alert("Order saved to database and sent to EcoTrack!");
+                    localStorage.removeItem('cart');
+                    window.location.reload();
+                } else {
+                    const errorMsg = result.ecoTrackResponse?.message || result.error || "Order creation failed.";
+                    alert("EcoTrack sync note: " + JSON.stringify(result));
+                }
             } catch (err) {
-                alert("Error placing order: " + err.message);
-                btn.disabled = false;
-                btn.textContent = "Confirm Order";
+                console.error("Submission Error:", err);
+                alert("An error occurred while submitting your order. Please try again.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Confirm Order";
             }
         }
 
-        async function sendToEcoTrack(orderDetails) {
-            try {
-                const { data, error } = await _supabase.functions.invoke('swift-processor', {
-                    body: orderDetails
-                });
-
-                if (error) {
-                    console.error("Supabase Edge Function error:", error);
-                    return { success: false, error: error.message };
-                }
-
-                if (data && (data.status === 200 || data.status === 201 || data.success || data.tracking || data.id)) {
-                    return { success: true, tracking: data.tracking || data.id };
-                } else {
-                    return { success: false, error: data?.message || JSON.stringify(data) };
-                }
-            } catch (err) {
-                console.error("EcoTrack connection error:", err);
-                return { success: false, error: err.message };
-            }
-        }
-
-        initWilayaSelect();
-        renderCart();
+        document.addEventListener('DOMContentLoaded', () => {
+            initWilayaSelect();
+            renderCart();
+        });
     </script>
 </body>
 </html>
