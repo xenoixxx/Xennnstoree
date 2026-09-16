@@ -263,18 +263,9 @@
                 .trim();
         }
 
+        // Returns exact dropdown string to guarantee EcoTrack matching
         function formatEcoTrackCommune(str) {
-            if (!str) return "";
-            return str
-                .trim()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .replace(/['’]/g, " ")
-                .replace(/\s+/g, " ")
-                .toLowerCase()
-                .split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
+            return str ? str.trim() : "";
         }
 
         function initWilayaSelect() {
@@ -396,8 +387,21 @@
                             const addr = data.address;
                             const road = addr.road || addr.pedestrian || addr.neighbourhood || "";
                             const rawDetectedCommune = addr.suburb || addr.town || addr.village || addr.city_district || addr.city || "";
+                            const rawDetectedState = addr.state || addr.province || "";
+
+                            // Try to match detected Wilaya
+                            const stateNorm = normalizeCompare(rawDetectedState);
+                            const wilayaSelect = document.getElementById('cust-wilaya');
+                            for (let code in WILAYA_RATES) {
+                                if (stateNorm.includes(normalizeCompare(WILAYA_RATES[code].name))) {
+                                    wilayaSelect.value = code;
+                                    onWilayaChange();
+                                    break;
+                                }
+                            }
+
+                            // Match detected Commune against dropdown options
                             const targetNorm = normalizeCompare(rawDetectedCommune);
-                            
                             const communeSelect = document.getElementById('cust-commune');
                             for (let i = 0; i < communeSelect.options.length; i++) {
                                 const optionNorm = normalizeCompare(communeSelect.options[i].value);
