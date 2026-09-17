@@ -44,7 +44,7 @@
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div>
                 <h1 class="text-xl font-black text-slate-900">Store Management Console</h1>
-                <p class="text-xs text-slate-500 font-medium">Manage catalog, orders, and stock statuses</p>
+                <p class="text-xs text-slate-500 font-medium">Manage catalog, orders, stock statuses, and user rewards</p>
             </div>
             <button onclick="handleLogout()" class="self-start md:self-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200">
                 Log Out
@@ -52,7 +52,7 @@
         </header>
 
         <!-- Stats Overview -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Orders</span>
                 <p id="stat-total-orders" class="text-2xl font-black text-slate-900">0</p>
@@ -68,6 +68,10 @@
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Out of Stock</span>
                 <p id="stat-out-stock" class="text-2xl font-black text-red-600">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Registered Users</span>
+                <p id="stat-total-users" class="text-2xl font-black text-indigo-600">0</p>
             </div>
         </div>
 
@@ -134,6 +138,9 @@
             </button>
             <button id="tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200">
                 All Products (<span id="tab-count-products">0</span>)
+            </button>
+            <button id="tab-btn-users" onclick="switchAdminTab('users')" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200">
+                Users & Loyalty (<span id="tab-count-users">0</span>)
             </button>
         </div>
 
@@ -211,6 +218,23 @@
                 </table>
             </div>
 
+            <!-- Users & Loyalty -->
+            <div id="tab-view-users" class="hidden overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                            <th class="p-4">User ID</th>
+                            <th class="p-4">Name</th>
+                            <th class="p-4">Phone Number</th>
+                            <th class="p-4">Loyalty Points</th>
+                            <th class="p-4">Joined Date</th>
+                            <th class="p-4 text-right">Manage Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-users" class="divide-y divide-slate-100 font-medium"></tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
@@ -239,6 +263,7 @@
         let localOrdersList = [];
         let importOrdersList = [];
         let productsList = [];
+        let usersList = [];
 
         function checkAuth() {
             const session = localStorage.getItem("admin_session");
@@ -317,11 +342,13 @@
             const btnImports = document.getElementById('tab-btn-imports');
             const btnStock = document.getElementById('tab-btn-stock');
             const btnProducts = document.getElementById('tab-btn-products');
+            const btnUsers = document.getElementById('tab-btn-users');
 
             const viewLocal = document.getElementById('tab-view-local');
             const viewImports = document.getElementById('tab-view-imports');
             const viewStock = document.getElementById('tab-view-stock');
             const viewProducts = document.getElementById('tab-view-products');
+            const viewUsers = document.getElementById('tab-view-users');
 
             const activeClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white transition shadow-sm";
             const inactiveClass = "px-4 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:text-slate-900 transition border border-slate-200";
@@ -330,16 +357,18 @@
             if (btnImports) btnImports.className = tab === 'imports' ? activeClass : inactiveClass;
             if (btnStock) btnStock.className = tab === 'stock' ? activeClass : inactiveClass;
             if (btnProducts) btnProducts.className = tab === 'products' ? activeClass : inactiveClass;
+            if (btnUsers) btnUsers.className = tab === 'users' ? activeClass : inactiveClass;
 
             if (viewLocal) viewLocal.classList.toggle('hidden', tab !== 'local');
             if (viewImports) viewImports.classList.toggle('hidden', tab !== 'imports');
             if (viewStock) viewStock.classList.toggle('hidden', tab !== 'stock');
             if (viewProducts) viewProducts.classList.toggle('hidden', tab !== 'products');
+            if (viewUsers) viewUsers.classList.toggle('hidden', tab !== 'users');
         }
 
         async function fetchAdminData() {
             if (!_supabase) return;
-            await Promise.all([fetchOrders(), fetchProducts()]);
+            await Promise.all([fetchOrders(), fetchProducts(), fetchUsers()]);
         }
 
         async function fetchOrders() {
@@ -537,6 +566,80 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        async function fetchUsers() {
+            if (!_supabase) return;
+            const { data, error } = await _supabase.from('users').select('*').order('id', { ascending: false });
+
+            if (error) {
+                console.error("Error fetching users:", error);
+                return;
+            }
+
+            usersList = data || [];
+            const statUsers = document.getElementById('stat-total-users');
+            const countUsers = document.getElementById('tab-count-users');
+
+            if (statUsers) statUsers.textContent = usersList.length;
+            if (countUsers) countUsers.textContent = usersList.length;
+
+            renderUsersTable();
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('table-users');
+            if (!tbody) return;
+            if (usersList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-bold">No registered users found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = usersList.map(u => {
+                const points = u.loyalty_points || u.points || 0;
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-mono font-bold text-indigo-600">#${u.id}</td>
+                        <td class="p-4 font-bold text-slate-900">${u.full_name || u.name || 'Anonymous User'}</td>
+                        <td class="p-4 font-mono text-slate-600">
+                            ${u.phone_number ? `<a href="tel:${u.phone_number}" class="hover:underline hover:text-indigo-600">📞 ${u.phone_number}</a>` : '-'}
+                        </td>
+                        <td class="p-4">
+                            <span class="bg-amber-50 text-amber-700 border border-amber-200 font-black text-xs px-2.5 py-1 rounded-lg">
+                                ⭐ ${points} Points
+                            </span>
+                        </td>
+                        <td class="p-4 text-slate-400">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
+                        <td class="p-4 text-right space-x-1">
+                            <button onclick="updateUserPoints(${u.id}, ${points + 10})" class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded hover:bg-emerald-100 transition font-bold">+10</button>
+                            <button onclick="updateUserPoints(${u.id}, ${points - 10})" class="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded hover:bg-amber-100 transition font-bold">-10</button>
+                            <button onclick="promptCustomPoints(${u.id}, ${points})" class="text-xs bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded hover:bg-slate-200 transition font-bold">Edit</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function updateUserPoints(userId, newPoints) {
+            if (!_supabase) return;
+            const pointsToSet = Math.max(0, newPoints);
+            const { error } = await _supabase
+                .from('users')
+                .update({ loyalty_points: pointsToSet })
+                .eq('id', userId);
+
+            if (error) {
+                alert("Failed to update points: " + error.message);
+            } else {
+                fetchUsers();
+            }
+        }
+
+        function promptCustomPoints(userId, currentPoints) {
+            const input = prompt("Enter new loyalty points total:", currentPoints);
+            if (input !== null && !isNaN(input)) {
+                updateUserPoints(userId, parseInt(input, 10));
+            }
         }
 
         async function toggleStock(productId, status) {
