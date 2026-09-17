@@ -57,10 +57,26 @@
             <div class="y2k-card p-6 rounded-3xl space-y-6 h-fit border-2 border-red-300">
                 <h2 class="text-xl font-black uppercase text-zinc-950 border-b border-red-100 pb-3">Order Summary</h2>
 
-                <div class="space-y-2 text-sm">
+                <!-- Promo Code Section -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase text-zinc-600">Promo Code</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="promo-code-input" placeholder="ENTER CODE" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2 text-sm uppercase font-bold focus:outline-none focus:border-red-500">
+                        <button type="button" onclick="applyPromoCode()" class="bg-zinc-950 hover:bg-zinc-800 text-white font-black text-xs px-4 py-2 rounded-xl uppercase transition">
+                            Apply
+                        </button>
+                    </div>
+                    <p id="promo-message" class="text-xs font-bold hidden"></p>
+                </div>
+
+                <div class="space-y-2 text-sm border-t border-red-100 pt-3">
                     <div class="flex justify-between text-zinc-600">
                         <span>Items Subtotal:</span>
                         <span id="summary-subtotal" class="font-bold text-zinc-950">0 DZD</span>
+                    </div>
+                    <div id="discount-row" class="flex justify-between text-emerald-600 font-bold hidden">
+                        <span>Promo Discount (10%):</span>
+                        <span id="summary-discount">-0 DZD</span>
                     </div>
                     <div class="flex justify-between text-zinc-600">
                         <span>Delivery Fee:</span>
@@ -254,6 +270,8 @@
         let currentCart = [];
         let itemsSubtotal = 0;
         let activeDeliveryFee = 0;
+        let isDiscountApplied = false;
+        let appliedPromoCode = "";
 
         function normalizeCompare(str) {
             return (str || '')
@@ -263,7 +281,6 @@
                 .trim();
         }
 
-        // Returns exact dropdown string to guarantee EcoTrack matching
         function formatEcoTrackCommune(str) {
             return str ? str.trim() : "";
         }
@@ -349,7 +366,18 @@
                 document.getElementById('summary-delivery-fee').textContent = "Select Wilaya";
             }
 
-            const grandTotal = itemsSubtotal + activeDeliveryFee;
+            const discount = isDiscountApplied ? (itemsSubtotal * 0.10) : 0;
+            const discountRow = document.getElementById('discount-row');
+            const discountEl = document.getElementById('summary-discount');
+
+            if (isDiscountApplied) {
+                discountRow.classList.remove('hidden');
+                discountEl.textContent = `-${discount.toLocaleString()} DZD`;
+            } else {
+                discountRow.classList.add('hidden');
+            }
+
+            const grandTotal = (itemsSubtotal - discount) + activeDeliveryFee;
 
             document.getElementById('summary-subtotal').textContent = `${itemsSubtotal.toLocaleString()} DZD`;
             document.getElementById('summary-grand-total').textContent = `${grandTotal.toLocaleString()} DZD`;
@@ -359,6 +387,53 @@
             currentCart.splice(index, 1);
             localStorage.setItem('cart', JSON.stringify(currentCart));
             renderCart();
+        }
+
+        async function applyPromoCode() {
+            const codeInput = document.getElementById('promo-code-input').value.trim().toLowerCase();
+            const msgEl = document.getElementById('promo-message');
+
+            msgEl.classList.remove('hidden', 'text-emerald-600', 'text-red-600', 'text-zinc-500');
+
+            if (codeInput !== "b2sxen") {
+                msgEl.textContent = "Invalid promo code.";
+                msgEl.classList.add('text-red-600');
+                isDiscountApplied = false;
+                appliedPromoCode = "";
+                calculateCartTotals();
+                return;
+            }
+
+            msgEl.textContent = "Checking code limits...";
+            msgEl.classList.add('text-zinc-500');
+
+            const { count, error } = await _supabase
+                .from('orders')
+                .select('id', { count: 'exact', head: true })
+                .eq('promo_code', 'b2sxen');
+
+            msgEl.classList.remove('text-zinc-500');
+
+            if (error) {
+                msgEl.textContent = "Error verifying promo code.";
+                msgEl.classList.add('text-red-600');
+                return;
+            }
+
+            if (count >= 10) {
+                msgEl.textContent = "Promo code expired (first 10 limit reached).";
+                msgEl.classList.add('text-red-600');
+                isDiscountApplied = false;
+                appliedPromoCode = "";
+            } else {
+                const remaining = 10 - count;
+                msgEl.textContent = `10% discount applied! (${remaining} uses remaining)`;
+                msgEl.classList.add('text-emerald-600');
+                isDiscountApplied = true;
+                appliedPromoCode = "b2sxen";
+            }
+
+            calculateCartTotals();
         }
 
         async function detectLocation() {
@@ -389,7 +464,6 @@
                             const rawDetectedCommune = addr.suburb || addr.town || addr.village || addr.city_district || addr.city || "";
                             const rawDetectedState = addr.state || addr.province || "";
 
-                            // Try to match detected Wilaya
                             const stateNorm = normalizeCompare(rawDetectedState);
                             const wilayaSelect = document.getElementById('cust-wilaya');
                             for (let code in WILAYA_RATES) {
@@ -400,7 +474,6 @@
                                 }
                             }
 
-                            // Match detected Commune against dropdown options
                             const targetNorm = normalizeCompare(rawDetectedCommune);
                             const communeSelect = document.getElementById('cust-commune');
                             for (let i = 0; i < communeSelect.options.length; i++) {
@@ -439,6 +512,23 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Processing...";
 
+            if (isDiscountApplied && appliedPromoCode === "b2sxen") {
+                const { count } = await _supabase
+                    .from('orders')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('promo_code', 'b2sxen');
+
+                if (count >= 10) {
+                    alert("The 10-person limit for promo code 'b2sxen' was reached. Discount removed.");
+                    isDiscountApplied = false;
+                    appliedPromoCode = "";
+                    calculateCartTotals();
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Confirm Order";
+                    return;
+                }
+            }
+
             const clientName = document.getElementById('cust-name').value;
             const clientPhone = document.getElementById('cust-phone').value;
             const rawWilaya = document.getElementById('cust-wilaya').value;
@@ -448,7 +538,8 @@
 
             const codeWilaya = parseInt(rawWilaya, 10);
             const sanitizedCommune = formatEcoTrackCommune(rawCommune);
-            const totalPrice = itemsSubtotal + activeDeliveryFee;
+            const discount = isDiscountApplied ? (itemsSubtotal * 0.10) : 0;
+            const totalPrice = (itemsSubtotal - discount) + activeDeliveryFee;
 
             const payload = {
                 clientName: clientName,
@@ -458,6 +549,7 @@
                 address: address,
                 deliveryType: deliveryType,
                 totalPrice: totalPrice,
+                promoCode: isDiscountApplied ? appliedPromoCode : null,
                 products: currentCart.map(item => `${item.title} (${item.size || 'Standard'})`).join(', ') || "Order from XENNNSTOREE"
             };
 
@@ -477,7 +569,6 @@
                     localStorage.removeItem('cart');
                     window.location.reload();
                 } else {
-                    const errorMsg = result.ecoTrackResponse?.message || result.error || "Order creation failed.";
                     alert("EcoTrack sync note: " + JSON.stringify(result));
                 }
             } catch (err) {
