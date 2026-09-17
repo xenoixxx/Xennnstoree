@@ -54,8 +54,19 @@
             <input type="text" id="search-input" onkeyup="filterProducts()" placeholder="Search streetwear drops..." class="w-full bg-zinc-50 border border-red-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-red-500">
         </div>
 
-        <!-- Right Side Cart Action -->
+        <!-- Right Side User & Cart Actions -->
         <div class="flex items-center gap-3">
+            <!-- Points Counter Pill (Logged in) -->
+            <div id="user-points-badge" class="hidden items-center gap-1.5 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl cursor-pointer" onclick="openAuthModal()">
+                <span class="text-xs font-black text-red-600">⭐ <span id="header-points-val">0</span> PTS</span>
+            </div>
+
+            <!-- Auth Action Button -->
+            <button id="auth-btn" onclick="openAuthModal()" class="text-xs font-bold text-zinc-950 uppercase hover:text-red-600 transition bg-zinc-100 border border-zinc-200 px-3 py-2 rounded-xl">
+                Sign In
+            </button>
+
+            <!-- Cart Badge -->
             <a href="cart.html" class="relative text-xs font-bold text-zinc-950 uppercase hover:text-red-600 transition flex items-center gap-1 bg-zinc-100 border border-zinc-200 px-3 py-2 rounded-xl">
                 <span>Basket</span>
                 <span id="cart-count" class="ml-1 bg-red-600 text-white rounded-full px-2 py-0.5 text-[10px] font-black">0</span>
@@ -129,7 +140,34 @@
     </aside>
 
     <!-- Main Store Content -->
-    <main class="max-w-6xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
+    <main class="max-w-6xl mx-auto px-6 py-10 w-full flex-grow space-y-10">
+        <!-- Loyalty Rewards Banner -->
+        <section class="y2k-card rounded-3xl p-6 border-2 border-red-300 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center md:text-left">
+                <span class="bg-red-100 text-red-600 text-[10px] font-black px-2.5 py-1 rounded-full uppercase border border-red-200">XENNN VIP Club</span>
+                <h2 class="text-2xl md:text-3xl font-black uppercase text-zinc-950">Earn Free Streetwear Drops</h2>
+                <p class="text-xs text-zinc-600 max-w-md">Get <strong class="text-red-600">1 Point for every 1 DZD spent</strong>. Reach <strong class="text-red-600">5,000 Points</strong> to unlock a 100% FREE item reward!</p>
+            </div>
+
+            <div class="w-full md:w-80 bg-white p-4 rounded-2xl border border-red-100 shadow-inner space-y-3">
+                <div class="flex justify-between items-center text-xs font-black">
+                    <span class="text-zinc-600 uppercase">Your Progress</span>
+                    <span id="rewards-points-count" class="text-red-600">0 / 5,000 PTS</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-zinc-100 h-3 rounded-full overflow-hidden border border-zinc-200">
+                    <div id="rewards-progress-bar" class="bg-gradient-to-r from-red-500 to-red-600 h-full w-0 transition-all duration-500"></div>
+                </div>
+
+                <div id="rewards-action-container">
+                    <button id="claim-reward-btn" onclick="claimFreeProduct()" disabled class="w-full bg-zinc-200 text-zinc-400 py-2 rounded-xl font-black uppercase text-xs cursor-not-allowed transition">
+                        🔒 Reach 5,000 PTS To Claim
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <!-- Hero Section -->
         <section class="text-center space-y-4 max-w-2xl mx-auto">
             <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tight text-zinc-950">
@@ -154,6 +192,47 @@
             </div>
         </section>
     </main>
+
+    <!-- Account Auth Modal (Sign Up / Sign In / Guest Option) -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="y2k-card p-6 md:p-8 rounded-3xl max-w-md w-full space-y-6 border-2 border-red-300 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-red-100 pb-3">
+                <h3 id="auth-modal-title" class="text-xl font-black uppercase text-zinc-950">Sign In to Account</h3>
+                <button onclick="closeAuthModal()" class="text-zinc-400 hover:text-zinc-950 font-bold text-lg">✕</button>
+            </div>
+
+            <!-- Sign In / Sign Up Form -->
+            <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+                <div id="auth-name-field" class="hidden">
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Full Name *</label>
+                    <input type="text" id="auth-name" placeholder="e.g. Amine Batata" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Phone Number *</label>
+                    <input type="tel" id="auth-phone" required placeholder="05XX XX XX XX" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-zinc-600 mb-1">Password *</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full y2k-btn py-3.5 rounded-xl text-white font-black uppercase tracking-wider text-xs shadow-md">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="space-y-2 text-center pt-2 border-t border-red-100">
+                <button type="button" id="auth-toggle-btn" onclick="toggleAuthMode()" class="w-full text-xs font-bold text-red-600 hover:underline block">
+                    Don't have an account? Sign Up
+                </button>
+                <button type="button" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-xs uppercase transition border border-zinc-200">
+                    Continue as Guest
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Import Request Modal -->
     <div id="import-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -203,6 +282,10 @@
                     <div class="flex justify-between text-sm font-black text-red-600 border-t border-red-200 pt-2">
                         <span>Total Estimated Cost:</span>
                         <span id="summary-grand-total">0 DZD</span>
+                    </div>
+                    <div class="flex justify-between text-[11px] font-bold text-emerald-600 pt-1 border-t border-dashed border-red-200">
+                        <span>Points Earned From This Order:</span>
+                        <span id="summary-points-earned">+0 PTS</span>
                     </div>
                 </div>
 
@@ -313,6 +396,10 @@
         let calculatedDZD = 0;
         let selectedShippingFee = 0;
 
+        // Current User Profile State
+        let currentUser = JSON.parse(localStorage.getItem('xenn_user') || 'null');
+        let isSignUpMode = false;
+
         function toggleSideMenu() {
             const overlay = document.getElementById('side-menu-overlay');
             const drawer = document.getElementById('side-menu-drawer');
@@ -328,9 +415,9 @@
             }
         }
 
-        // Category Filter function linked to drawer items
+        // Category Filter function
         function filterByCategory(keyword) {
-            toggleSideMenu(); // Close side panel
+            toggleSideMenu();
             
             const titleEl = document.getElementById('catalog-title');
             if (keyword === 'all') {
@@ -342,7 +429,6 @@
                 renderProducts(filtered);
             }
 
-            // Smooth scroll to product grid
             document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -358,7 +444,6 @@
         function calculateTotals() {
             const usdVal = parseFloat(document.getElementById('import-usd-price').value) || 0;
             
-            // Item converted value + 9% profit margin applied
             calculatedDZD = Math.round(usdVal * EFFECTIVE_RATE);
             document.getElementById('summary-dzd-price').textContent = `${calculatedDZD.toLocaleString()} DZD`;
 
@@ -375,9 +460,16 @@
 
             const grandTotal = calculatedDZD + selectedShippingFee;
             document.getElementById('summary-grand-total').textContent = `${grandTotal.toLocaleString()} DZD`;
+            document.getElementById('summary-points-earned').textContent = currentUser ? `+${grandTotal.toLocaleString()} PTS` : `Sign in to earn +${grandTotal.toLocaleString()} PTS`;
         }
 
         function openImportModal() {
+            // Auto-fill user details if logged in
+            if (currentUser) {
+                if (currentUser.name) document.getElementById('import-name').value = currentUser.name;
+                if (currentUser.phone) document.getElementById('import-phone').value = currentUser.phone;
+            }
+
             document.getElementById('import-modal').classList.remove('hidden');
         }
 
@@ -385,8 +477,172 @@
             document.getElementById('import-modal').classList.add('hidden');
         }
 
+        /* --- AUTH & POINTS SYSTEM LOGIC --- */
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            const nameField = document.getElementById('auth-name-field');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+            const title = document.getElementById('auth-modal-title');
+
+            if (isSignUpMode) {
+                nameField.classList.remove('hidden');
+                submitBtn.textContent = "Sign Up";
+                toggleBtn.textContent = "Already have an account? Sign In";
+                title.textContent = "Create VIP Account";
+            } else {
+                nameField.classList.add('hidden');
+                submitBtn.textContent = "Sign In";
+                toggleBtn.textContent = "Don't have an account? Sign Up";
+                title.textContent = "Sign In to Account";
+            }
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const phone = document.getElementById('auth-phone').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const name = document.getElementById('auth-name').value.trim();
+
+            if (isSignUpMode) {
+                // Check if user exists in Supabase profiles
+                const { data: existingUser } = await _supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('phone', phone)
+                    .single();
+
+                if (existingUser) {
+                    alert("An account with this phone number already exists! Please sign in.");
+                    toggleAuthMode();
+                    return;
+                }
+
+                // Create new Profile entry
+                const newUser = { phone, password, name, points: 0 };
+                const { data, error } = await _supabase.from('profiles').insert([newUser]).select().single();
+
+                if (error) {
+                    // Fallback local save if Supabase profile table is absent
+                    currentUser = newUser;
+                } else {
+                    currentUser = data;
+                }
+
+                localStorage.setItem('xenn_user', JSON.stringify(currentUser));
+                alert("Account created successfully! You are now earning 1 point for every 1 DZD spent.");
+            } else {
+                // Sign In Login Flow
+                const { data: userProfile, error } = await _supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('phone', phone)
+                    .eq('password', password)
+                    .single();
+
+                if (error || !userProfile) {
+                    // Check local state fallback
+                    if (currentUser && currentUser.phone === phone && currentUser.password === password) {
+                        alert("Welcome back!");
+                    } else {
+                        alert("Invalid phone number or password.");
+                        return;
+                    }
+                } else {
+                    currentUser = userProfile;
+                }
+                localStorage.setItem('xenn_user', JSON.stringify(currentUser));
+            }
+
+            updateUserUI();
+            closeAuthModal();
+        }
+
+        function updateUserUI() {
+            const authBtn = document.getElementById('auth-btn');
+            const pointsBadge = document.getElementById('user-points-badge');
+
+            if (currentUser) {
+                authBtn.textContent = "Sign Out";
+                authBtn.onclick = logoutUser;
+                pointsBadge.classList.remove('hidden');
+                pointsBadge.classList.add('flex');
+                
+                const currentPts = currentUser.points || 0;
+                document.getElementById('header-points-val').textContent = currentPts.toLocaleString();
+                document.getElementById('rewards-points-count').textContent = `${currentPts.toLocaleString()} / 5,000 PTS`;
+
+                // Progress percentage capped at 100%
+                const pct = Math.min(100, Math.round((currentPts / 5000) * 100));
+                document.getElementById('rewards-progress-bar').style.width = `${pct}%`;
+
+                // Reward Eligibility Action Button
+                const claimBtn = document.getElementById('claim-reward-btn');
+                if (currentPts >= 5000) {
+                    claimBtn.disabled = false;
+                    claimBtn.className = "w-full y2k-btn py-2 rounded-xl font-black uppercase text-xs text-white shadow-md cursor-pointer animate-bounce";
+                    claimBtn.textContent = "🎁 CLAIM FREE PRODUCT NOW";
+                } else {
+                    claimBtn.disabled = true;
+                    claimBtn.className = "w-full bg-zinc-200 text-zinc-400 py-2 rounded-xl font-black uppercase text-xs cursor-not-allowed transition";
+                    claimBtn.textContent = `🔒 Need ${(5000 - currentPts).toLocaleString()} More PTS`;
+                }
+            } else {
+                authBtn.textContent = "Sign In";
+                authBtn.onclick = openAuthModal;
+                pointsBadge.classList.add('hidden');
+                pointsBadge.classList.remove('flex');
+
+                document.getElementById('rewards-points-count').textContent = "0 / 5,000 PTS";
+                document.getElementById('rewards-progress-bar').style.width = "0%";
+                
+                const claimBtn = document.getElementById('claim-reward-btn');
+                claimBtn.disabled = true;
+                claimBtn.className = "w-full bg-zinc-200 text-zinc-400 py-2 rounded-xl font-black uppercase text-xs cursor-not-allowed transition";
+                claimBtn.textContent = "🔒 Sign In To Track Points";
+            }
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            localStorage.removeItem('xenn_user');
+            updateUserUI();
+            alert("Signed out successfully.");
+        }
+
+        async function addPointsToUser(pointsEarned) {
+            if (!currentUser) return;
+
+            currentUser.points = (currentUser.points || 0) + pointsEarned;
+            localStorage.setItem('xenn_user', JSON.stringify(currentUser));
+
+            // Sync with Supabase database table
+            if (currentUser.id || currentUser.phone) {
+                await _supabase
+                    .from('profiles')
+                    .update({ points: currentUser.points })
+                    .eq('phone', currentUser.phone);
+            }
+            updateUserUI();
+        }
+
+        function claimFreeProduct() {
+            if (!currentUser || (currentUser.points || 0) < 5000) return;
+
+            alert("🎉 CONGRATULATIONS! You unlocked a Free Product Reward!\nOur team will contact you on your registered phone number (" + currentUser.phone + ") to arrange delivery of your free item.");
+        }
+
         async function handleImportOrder(e) {
             e.preventDefault();
+
             const btn = document.getElementById('import-submit-btn');
             btn.disabled = true;
             btn.textContent = "Submitting Request...";
@@ -399,6 +655,7 @@
             const userAddress = document.getElementById('import-address').value;
 
             const grandTotal = calculatedDZD + selectedShippingFee;
+            const pointsEarned = grandTotal; // 1 DZD = 1 Point
 
             const fullAddressInfo = `${userAddress} (${deliveryType === 'home' ? 'Home' : 'Stop Desk'} | Delivery: ${selectedShippingFee} DZD | Grand Total: ${grandTotal} DZD)`;
 
@@ -417,7 +674,14 @@
             if (error) {
                 alert("Failed to submit request: " + error.message);
             } else {
-                alert(`Import request submitted!\nItem Total (with 9% profit): ${calculatedDZD.toLocaleString()} DZD\nDelivery Fee: ${selectedShippingFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD\nWe will contact you shortly!`);
+                if (currentUser) {
+                    // Award points to the logged-in user
+                    await addPointsToUser(pointsEarned);
+                    alert(`Import request submitted!\nItem Total: ${calculatedDZD.toLocaleString()} DZD\nDelivery Fee: ${selectedShippingFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD\n\n⭐ YOU EARNED +${pointsEarned.toLocaleString()} POINTS!`);
+                } else {
+                    alert(`Import request submitted as Guest!\nItem Total: ${calculatedDZD.toLocaleString()} DZD\nDelivery Fee: ${selectedShippingFee.toLocaleString()} DZD\nGrand Total: ${grandTotal.toLocaleString()} DZD\n\n💡 Tip: Create an account next time to earn +${pointsEarned.toLocaleString()} loyalty points towards free rewards!`);
+                }
+
                 document.getElementById('import-order-form').reset();
                 calculateTotals();
                 closeImportModal();
@@ -494,6 +758,7 @@
 
         initWilayaSelect();
         updateCartBadge();
+        updateUserUI();
         loadProducts();
     </script>
 </body>
